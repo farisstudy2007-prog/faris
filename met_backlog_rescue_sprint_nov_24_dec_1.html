@@ -1,0 +1,4159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MET Backlog Rescue Sprint (Nov 24 – Dec 1)</title>
+
+  <!-- Clean Google Fonts with crisp system fallback for full offline reliability -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================================================================
+       DESIGN TOKENS & OBSIDIAN DARK THEME
+       ========================================================================= */
+    :root {
+      --bg-base: #090d16;
+      --bg-elevated: rgba(15, 22, 38, 0.78);
+      --bg-card: rgba(17, 25, 43, 0.82);
+      --bg-card-hover: rgba(23, 33, 56, 0.92);
+      --bg-input: rgba(10, 15, 28, 0.88);
+      --border-subtle: rgba(148, 163, 184, 0.13);
+      --border-strong: rgba(148, 163, 184, 0.26);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      /* Distinct Color Coding Palette */
+      --quiz-color: #f43f5e;       /* Urgent Quiz: Crimson/Rose */
+      --quiz-bg: rgba(244, 63, 94, 0.15);
+      --quiz-border: rgba(244, 63, 94, 0.45);
+
+      --cs-color: #ff5c6c;         /* Priority #1 CS: Coral/Red */
+      --cs-bg: rgba(255, 92, 108, 0.14);
+      --cs-border: rgba(255, 92, 108, 0.42);
+
+      --elct-color: #fb923c;       /* Priority #2 ELCT: Amber/Orange */
+      --elct-bg: rgba(251, 146, 60, 0.14);
+      --elct-border: rgba(251, 146, 60, 0.42);
+
+      --math-color: #60a5fa;       /* Priority #3 MATH: Blue/Indigo */
+      --math-bg: rgba(96, 165, 250, 0.14);
+      --math-border: rgba(96, 165, 250, 0.42);
+
+      --phys-color: #2dd4bf;       /* Priority #4 PHYSICS: Cyan/Teal */
+      --phys-bg: rgba(45, 212, 191, 0.14);
+      --phys-border: rgba(45, 212, 191, 0.42);
+
+      --newtut-color: #a78bfa;     /* New/Upcoming Tuts: Violet/Purple */
+      --newtut-bg: rgba(167, 139, 250, 0.15);
+      --newtut-border: rgba(167, 139, 250, 0.44);
+
+      --uni-color: #34d399;        /* Uni Classes: Emerald/Slate */
+      --uni-bg: rgba(52, 211, 153, 0.12);
+      --uni-border: rgba(52, 211, 153, 0.32);
+
+      --sport-color: #a3e635;      /* Coffee + Gym/Sports: Lime + Coffee-Gold */
+      --coffee-color: #f59e0b;
+      --sport-bg: rgba(163, 230, 53, 0.12);
+      --sport-border: rgba(163, 230, 53, 0.36);
+
+      --rest-color: #fbbf24;       /* Rest/Hangout: Soft Warm Amber */
+      --rest-bg: rgba(251, 191, 36, 0.13);
+      --rest-border: rgba(251, 191, 36, 0.36);
+
+      --buffer-color: #38bdf8;     /* Buffer/AI: Sky Cyan */
+      --buffer-bg: rgba(56, 189, 248, 0.14);
+      --buffer-border: rgba(56, 189, 248, 0.4);
+
+      --success: #10b981;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-card: 0 12px 32px -12px rgba(0, 0, 0, 0.65);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    /* =========================================================================
+       RESET & BASE STYLES
+       ========================================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+    }
+
+    button {
+      font-family: inherit;
+      color: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    /* =========================================================================
+       AMBIENT GLOW BACKGROUND ORBS & GRID
+       ========================================================================= */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .ambient-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at top, black 35%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at top, black 35%, transparent 80%);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(115px);
+      opacity: 0.16;
+      will-change: transform;
+    }
+
+    .orb-1 {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, #f43f5e, transparent 70%);
+      top: -160px;
+      left: -130px;
+      animation: orbDrift1 22s ease-in-out infinite alternate;
+    }
+
+    .orb-2 {
+      width: 460px;
+      height: 460px;
+      background: radial-gradient(circle, #60a5fa, transparent 70%);
+      top: 18%;
+      right: -140px;
+      animation: orbDrift2 26s ease-in-out infinite alternate;
+    }
+
+    .orb-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #a78bfa, transparent 70%);
+      bottom: -140px;
+      left: 34%;
+      opacity: 0.13;
+      animation: orbDrift3 24s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbDrift1 {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(65px, 50px) scale(1.1); }
+    }
+    @keyframes orbDrift2 {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(-60px, 75px) scale(1.12); }
+    }
+    @keyframes orbDrift3 {
+      from { transform: translate(0, 0) scale(0.95); }
+      to { transform: translate(55px, -55px) scale(1.08); }
+    }
+
+    /* Confetti Overlay Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* =========================================================================
+       LAYOUT CONTAINER & GLASS SURFACES
+       ========================================================================= */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1460px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    @media (min-width: 768px) {
+      .app-shell { padding: 26px 26px 56px; }
+    }
+
+    .glass-panel {
+      background: var(--bg-elevated);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* =========================================================================
+       1. MISSION CONTROL HEADER
+       ========================================================================= */
+    .mission-header {
+      padding: 20px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mission-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cs-color), var(--elct-color), var(--math-color), var(--phys-color), var(--newtut-color));
+      opacity: 0.9;
+    }
+
+    .header-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand-eyebrow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .chip-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(244, 63, 94, 0.14);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f43f5e;
+      animation: pulseRing 1.8s ease-out infinite;
+    }
+
+    @keyframes pulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.75); }
+      70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+
+    .chip-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .mission-title {
+      font-size: clamp(1.38rem, 2.5vw, 2rem);
+      font-weight: 800;
+      line-height: 1.18;
+      color: var(--text-primary);
+    }
+
+    .mission-title .gradient-text {
+      background: linear-gradient(95deg, #ff5c6c 0%, #fb923c 35%, #60a5fa 70%, #2dd4bf 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .mission-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* Main Backlog Rescue Hero Counter */
+    .rescue-hero-box {
+      flex: 1 1 320px;
+      max-width: 520px;
+      background: rgba(10, 15, 28, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .rescue-hero-box.mission-complete {
+      border-color: rgba(16, 185, 129, 0.55);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(6, 182, 212, 0.08));
+      box-shadow: 0 0 28px -8px rgba(16, 185, 129, 0.45);
+    }
+
+    .rescue-counter-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .rescue-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+
+    .rescue-big-count {
+      font-family: var(--font-mono);
+      font-size: clamp(1.1rem, 2vw, 1.38rem);
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rescue-big-count.zeroed {
+      color: #34d399;
+      text-shadow: 0 0 18px rgba(52, 211, 153, 0.45);
+    }
+
+    .rescue-bar-track {
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(30, 41, 59, 0.92);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+    }
+
+    .rescue-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--cs-color), var(--elct-color), var(--math-color), var(--phys-color), var(--success));
+      background-size: 200% 100%;
+      transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: gradientFlow 4s linear infinite;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .rescue-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .rescue-meta-row strong {
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+
+    /* 4 Subject Priority Pills (Strict Order) */
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .priority-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1080px) {
+      .priority-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .priority-pill {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(12, 18, 32, 0.85);
+      border: 1px solid var(--pill-border, var(--border-subtle));
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      overflow: hidden;
+    }
+
+    .priority-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -10px var(--pill-glow, rgba(0, 0, 0, 0.5));
+    }
+
+    .priority-pill.cleared {
+      border-color: rgba(16, 185, 129, 0.55);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(12, 18, 32, 0.88));
+      box-shadow: 0 0 22px -6px rgba(16, 185, 129, 0.42);
+    }
+
+    .priority-pill-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .priority-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .priority-rank {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 7px;
+      background: var(--pill-bg);
+      color: var(--pill-accent);
+      border: 1px solid var(--pill-border);
+      flex-shrink: 0;
+    }
+
+    .priority-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .priority-count {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--pill-accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .priority-pill.cleared .priority-count {
+      color: #34d399;
+    }
+
+    .cleared-check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10b981;
+      color: #052e16;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.85);
+      animation: checkPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0) rotate(-35deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .priority-bar-track {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .priority-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--pill-accent);
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .priority-pill.cleared .priority-bar-fill {
+      background: #10b981;
+    }
+
+    .priority-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .quiz-deadline-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      background: var(--quiz-bg);
+      color: #fda4af;
+      border: 1px solid var(--quiz-border);
+      animation: subtleUrgentPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes subtleUrgentPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.28); }
+      50% { box-shadow: 0 0 12px 1px rgba(244, 63, 94, 0.45); }
+    }
+
+    /* Live Goal Rings Row + AI Course Status Pill */
+    .goals-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .goals-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1200px) {
+      .goals-row { grid-template-columns: repeat(6, 1fr); }
+    }
+
+    .goal-ring-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: var(--radius-md);
+      background: rgba(11, 17, 30, 0.78);
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.22s ease, border-color 0.22s ease;
+    }
+
+    .goal-ring-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    .goal-info {
+      min-width: 0;
+    }
+
+    .goal-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .goal-metric {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    .goal-metric span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-wrap svg {
+      width: 44px;
+      height: 44px;
+    }
+
+    .ring-circle {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ring-pct {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    /* AI Course Status Pill Card */
+    .ai-status-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 11px 13px;
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px dashed rgba(148, 163, 184, 0.32);
+      transition: all 0.4s ease;
+    }
+
+    .ai-status-card.unlocked {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.16));
+      border: 1px solid rgba(52, 211, 153, 0.65);
+      box-shadow: 0 0 26px -6px rgba(52, 211, 153, 0.55);
+      animation: aiUnlockGlow 2.4s ease-in-out infinite;
+    }
+
+    @keyframes aiUnlockGlow {
+      0%, 100% { box-shadow: 0 0 18px -6px rgba(52, 211, 153, 0.45); }
+      50% { box-shadow: 0 0 30px -2px rgba(56, 189, 248, 0.65); }
+    }
+
+    .ai-status-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .ai-status-card.unlocked .ai-status-top {
+      color: #6ee7b7;
+    }
+
+    .ai-status-main {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #e2e8f0;
+      line-height: 1.25;
+    }
+
+    .ai-status-card.unlocked .ai-status-main {
+      color: #ffffff;
+    }
+
+    .ai-status-sub {
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    .ai-status-card.unlocked .ai-status-sub {
+      color: #a7f3d0;
+    }
+
+    /* =========================================================================
+       2. CONTROLS & FILTER BAR
+       ========================================================================= */
+    .controls-bar {
+      padding: 13px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .controls-top-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .controls-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Segmented Pill Toggles */
+    .segmented-switch {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      padding: 3px;
+      border-radius: 12px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .segmented-thumb {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 3px;
+      width: calc(50% - 3px);
+      border-radius: 9px;
+      transition: transform 0.28s cubic-bezier(0.34, 1.35, 0.64, 1), background 0.28s ease;
+      pointer-events: none;
+    }
+
+    .segmented-btn {
+      position: relative;
+      z-index: 1;
+      padding: 7px 13px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+
+    .segmented-btn.active {
+      color: #070b14;
+    }
+
+    .segmented-btn:not(.active):hover {
+      color: #fff;
+    }
+
+    /* Action Buttons */
+    .ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .ctrl-btn:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+      background: rgba(30, 41, 59, 0.85);
+    }
+
+    .ctrl-btn.active-toggle {
+      background: rgba(167, 139, 250, 0.16);
+      border-color: rgba(167, 139, 250, 0.45);
+      color: #ddd6fe;
+    }
+
+    .ctrl-btn.pomo-toggle-btn {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
+    .ctrl-btn.danger-btn:hover {
+      background: rgba(244, 63, 94, 0.16);
+      border-color: rgba(244, 63, 94, 0.45);
+      color: #fda4af;
+    }
+
+    /* Filter Chips Row */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      overflow-x: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+    }
+
+    .filter-chip.active {
+      background: #f8fafc;
+      color: #090d16;
+      border-color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(248, 250, 252, 0.18);
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* =========================================================================
+       3. MAIN WORKSPACE: SCHEDULE (LEFT) + POMODORO WIDGET (RIGHT)
+       ========================================================================= */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (min-width: 1080px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr) 360px;
+      }
+      .workspace.pomo-collapsed {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .schedule-col {
+      min-width: 0;
+    }
+
+    /* Day Tabs Strip (8 Days: Nov 24 - Dec 1) */
+    .day-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .day-tabs::-webkit-scrollbar { display: none; }
+
+    .day-tab {
+      position: relative;
+      flex: 0 0 auto;
+      min-width: 122px;
+      padding: 10px 13px;
+      border-radius: 15px;
+      background: rgba(15, 22, 38, 0.75);
+      border: 1px solid var(--border-subtle);
+      text-align: left;
+      transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .day-tab:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .day-tab.active {
+      background: linear-gradient(145deg, rgba(96, 165, 250, 0.2), rgba(17, 25, 43, 0.95) 60%, rgba(167, 139, 250, 0.18));
+      border-color: rgba(96, 165, 250, 0.65);
+      box-shadow: 0 10px 26px -10px rgba(96, 165, 250, 0.38);
+      transform: translateY(-2px);
+    }
+
+    .day-tab-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .day-tab-num {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .day-tab.active .day-tab-num {
+      color: #93c5fd;
+    }
+
+    .today-pill {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      letter-spacing: 0.04em;
+    }
+
+    .day-tab-date {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .day-tab-progress {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    .day-done-badge {
+      color: #34d399;
+      font-weight: 800;
+    }
+
+    /* Active Day Header Banner */
+    .day-banner {
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-left: 4px solid #60a5fa;
+    }
+
+    .day-banner-left {
+      min-width: 0;
+    }
+
+    .day-banner-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .day-banner-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .day-tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      background: rgba(96, 165, 250, 0.16);
+      color: #bfdbfe;
+      border: 1px solid rgba(96, 165, 250, 0.35);
+    }
+
+    .day-banner-note {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .day-banner-stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: rgba(9, 13, 22, 0.75);
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .day-stat-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* =========================================================================
+       SCHEDULE CARDS & STAGGERED ANIMATIONS
+       ========================================================================= */
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    @keyframes cardEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(15px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .task-card {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 15px 16px 15px 19px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.25s ease,
+                  border-color 0.25s ease,
+                  opacity 0.25s ease;
+      overflow: hidden;
+      opacity: 0;
+      animation: cardEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .task-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--card-accent, #60a5fa);
+    }
+
+    .task-card:hover {
+      transform: translateY(-2px);
+      background: var(--bg-card-hover);
+      border-color: var(--card-border, var(--border-strong));
+      box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.72), 0 0 22px -8px var(--card-glow, rgba(96, 165, 250, 0.22));
+    }
+
+    .task-card.is-completed {
+      opacity: 0.56;
+      background: rgba(12, 18, 32, 0.55);
+    }
+
+    .task-card.is-completed .task-title {
+      text-decoration: line-through;
+      text-decoration-color: #10b981;
+      text-decoration-thickness: 2px;
+      color: var(--text-muted);
+    }
+
+    .task-card.is-skipped {
+      opacity: 0.58;
+      background: rgba(12, 18, 32, 0.4);
+      border: 1.5px dashed rgba(148, 163, 184, 0.26);
+    }
+
+    .task-card.is-skipped .task-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-card.is-active-focus {
+      border-color: rgba(244, 63, 94, 0.65);
+      box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.3), 0 14px 30px -10px rgba(244, 63, 94, 0.3);
+    }
+
+    .task-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--card-bg, rgba(96, 165, 250, 0.14));
+      border: 1px solid var(--card-border, rgba(96, 165, 250, 0.35));
+      color: var(--card-accent, #60a5fa);
+      margin-top: 2px;
+    }
+
+    .task-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-meta-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .task-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .time-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+
+    .cat-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--card-bg);
+      color: var(--card-accent);
+      border: 1px solid var(--card-border);
+    }
+
+    .cat-pill.urgent-pulse {
+      animation: subtleUrgentPulse 2s ease-in-out infinite;
+    }
+
+    .room-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(251, 191, 36, 0.12);
+      color: #fde68a;
+      border: 1px solid rgba(251, 191, 36, 0.28);
+    }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .focus-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(244, 63, 94, 0.16);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.38);
+      transition: all 0.2s ease;
+    }
+
+    .focus-btn:hover {
+      background: rgba(244, 63, 94, 0.28);
+      border-color: rgba(244, 63, 94, 0.7);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .focus-btn.focusing {
+      background: #f43f5e;
+      color: #fff;
+      border-color: #fb7185;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.55);
+    }
+
+    .check-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 2px solid rgba(148, 163, 184, 0.42);
+      background: rgba(9, 13, 22, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    .check-btn:hover {
+      border-color: #10b981;
+      transform: scale(1.08);
+    }
+
+    .check-btn.checked {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #34d399;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.55);
+    }
+
+    .check-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: #fff;
+      stroke-width: 3;
+      fill: none;
+      stroke-dasharray: 24;
+      stroke-dashoffset: 24;
+      transition: stroke-dashoffset 0.25s ease 0.04s;
+    }
+
+    .check-btn.checked svg {
+      stroke-dashoffset: 0;
+    }
+
+    .skip-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 7px;
+      border: 1px dashed rgba(148, 163, 184, 0.35);
+      color: var(--text-dim);
+    }
+
+    .task-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.32;
+    }
+
+    .task-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .recovery-note {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(251, 146, 60, 0.12);
+      border: 1px solid rgba(251, 146, 60, 0.35);
+      color: #fed7aa;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* Subtle Coffee Steam & Sport Float Animations */
+    @keyframes steamRise {
+      0% { transform: translateY(3px) scaleY(0.85); opacity: 0; }
+      45% { opacity: 0.95; }
+      100% { transform: translateY(-5px) scaleY(1.1); opacity: 0; }
+    }
+    .steam-1 { animation: steamRise 2.1s ease-in-out infinite; }
+    .steam-2 { animation: steamRise 2.1s ease-in-out 0.6s infinite; }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .anim-float { animation: gentleFloat 2.4s ease-in-out infinite; }
+
+    /* =========================================================================
+       FULL 8-DAY OVERVIEW GRID
+       ========================================================================= */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 720px) {
+      .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .workspace.pomo-collapsed .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 720px) {
+      .workspace.pomo-collapsed .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1180px) {
+      .workspace.pomo-collapsed .overview-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .overview-day-col {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .overview-day-col.is-today {
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 26px -10px rgba(56, 189, 248, 0.35);
+    }
+
+    .overview-day-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .overview-day-col .task-card {
+      padding: 11px 12px 11px 14px;
+      gap: 10px;
+    }
+
+    .overview-day-col .task-icon-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+    }
+
+    .overview-day-col .task-title {
+      font-size: 13.5px;
+    }
+
+    .overview-day-col .task-desc {
+      font-size: 11.5px;
+    }
+
+    /* =========================================================================
+       4. INTEGRATED POMODORO TIMER WIDGET
+       ========================================================================= */
+    .pomo-col {
+      position: relative;
+    }
+
+    @media (min-width: 1080px) {
+      .pomo-col {
+        position: sticky;
+        top: 20px;
+      }
+    }
+
+    .workspace.pomo-collapsed .pomo-col {
+      display: none;
+    }
+
+    .pomo-panel {
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pomo-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f43f5e, #fb923c, #38bdf8);
+    }
+
+    @keyframes pomoFlash {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.65); }
+      70% { box-shadow: 0 0 0 14px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+    .pomo-panel.flash {
+      animation: pomoFlash 0.8s ease-out;
+    }
+
+    .pomo-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .pomo-head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pomo-icon-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: rgba(244, 63, 94, 0.16);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fb7185;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pomo-head h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .pomo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .icon-square-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .icon-square-btn:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+    }
+
+    /* Active Task Box inside Pomodoro */
+    .pomo-active-task {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(9, 13, 22, 0.8);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pomo-task-text-wrap {
+      min-width: 0;
+    }
+
+    .pomo-task-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+    }
+
+    .pomo-task-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    /* Presets Grid */
+    .pomo-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pomo-breaks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .preset-btn {
+      padding: 7px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .preset-btn:hover {
+      color: #fff;
+      border-color: var(--border-strong);
+    }
+
+    .preset-btn.active {
+      background: rgba(244, 63, 94, 0.18);
+      border-color: rgba(244, 63, 94, 0.55);
+      color: #fecdd3;
+      box-shadow: 0 0 14px -4px rgba(244, 63, 94, 0.45);
+    }
+
+    .preset-btn.break-active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #a7f3d0;
+    }
+
+    /* Circular Countdown Ring */
+    .pomo-ring-stage {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0 18px;
+    }
+
+    .pomo-ring-shell {
+      position: relative;
+      width: 204px;
+      height: 204px;
+      border-radius: 50%;
+      background: rgba(7, 11, 20, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.35s ease;
+    }
+
+    .pomo-ring-shell.running {
+      animation: pomoGlowPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pomoGlowPulse {
+      0%, 100% { box-shadow: 0 0 22px -6px var(--pomo-glow, rgba(244, 63, 94, 0.45)); }
+      50% { box-shadow: 0 0 42px 2px var(--pomo-glow, rgba(244, 63, 94, 0.65)); }
+    }
+
+    .pomo-ring-svg {
+      width: 192px;
+      height: 192px;
+    }
+
+    .pomo-ring-fg {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.5s linear;
+    }
+
+    .pomo-ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .pomo-mode-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fda4af;
+      margin-bottom: 4px;
+    }
+
+    .pomo-digits {
+      font-family: var(--font-mono);
+      font-size: 40px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .pomo-cycle-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Timer Primary Controls */
+    .pomo-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .pomo-start-btn {
+      flex: 1;
+      max-width: 175px;
+      padding: 11px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #090d16;
+      background: linear-gradient(135deg, #fb7185, #fb923c);
+      box-shadow: 0 10px 24px -8px rgba(244, 63, 94, 0.55);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: transform 0.18s ease, filter 0.2s ease;
+    }
+
+    .pomo-start-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .pomo-start-btn:active {
+      transform: scale(0.97);
+    }
+
+    .pomo-start-btn.break-btn {
+      background: linear-gradient(135deg, #34d399, #38bdf8);
+      box-shadow: 0 10px 24px -8px rgba(16, 185, 129, 0.5);
+    }
+
+    .pomo-secondary-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .pomo-secondary-btn:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+    }
+
+    .pomo-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .pomo-stat-tile {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(9, 13, 22, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .pomo-stat-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .pomo-stat-num {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    /* Floating Mini Timer Pill (shown when Pomodoro Panel is collapsed and running) */
+    .floating-mini-pomo {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(244, 63, 94, 0.5);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+      cursor: pointer;
+    }
+
+    .floating-mini-pomo.visible {
+      display: inline-flex;
+    }
+
+    /* =========================================================================
+       MODALS (SYNC CODE & RESET CONFIRMATION) & TOASTS
+       ========================================================================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(4, 7, 15, 0.78);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      padding: 22px;
+      border-radius: 20px;
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+      animation: cardEnter 0.25s ease forwards;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .sync-textarea {
+      width: 100%;
+      min-height: 115px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-strong);
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .sync-textarea:focus {
+      border-color: #60a5fa;
+    }
+
+    .sync-msg {
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 18px;
+      margin-bottom: 12px;
+    }
+
+    .sync-msg.error { color: #fda4af; }
+    .sync-msg.ok { color: #6ee7b7; }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      padding: 9px 16px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #070b14;
+      transition: filter 0.2s ease;
+    }
+
+    .btn-primary:hover { filter: brightness(1.08); }
+
+    .btn-danger {
+      padding: 9px 16px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      padding: 9px 15px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 700;
+      background: rgba(30, 41, 59, 0.85);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-ghost:hover { color: #fff; }
+
+    /* Toast Stack */
+    .toast-stack {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 340px;
+      width: calc(100vw - 40px);
+      pointer-events: none;
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+      animation: cardEnter 0.3s ease forwards;
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .toast-body {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .empty-state {
+      padding: 36px 20px;
+      text-align: center;
+      border-radius: 16px;
+      border: 1px dashed var(--border-strong);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .hidden { display: none !important; }
+
+    .app-footer {
+      margin-top: 34px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Obsidian Glow & Subtle Grid -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Pure JS Confetti Celebration Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Toast Notification Stack -->
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <!-- Floating Mini Timer (visible if panel collapsed while running) -->
+  <button id="floatingMiniPomo" class="floating-mini-pomo" title="Expand Pomodoro Timer">
+    <span class="pulse-dot"></span>
+    <span id="miniPomoDigits" style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:#fff;">50:00</span>
+    <span style="font-size:11px;font-weight:700;color:#fda4af;">Open Timer</span>
+  </button>
+
+  <!-- Sync / Backup Code Modal (iPad <-> Laptop transfer) -->
+  <div id="syncModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="syncModalTitle" class="modal-title">Sync Progress (iPad ↔ Laptop)</h3>
+        <button id="closeSyncModalBtn" class="icon-square-btn" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc">
+        Copy this JSON backup string from one device and paste it on the other to sync all checked tutorials, Pomodoro count, and week settings.
+      </p>
+      <textarea id="syncTextarea" class="sync-textarea" spellcheck="false" aria-label="Sync JSON code"></textarea>
+      <div id="syncStatusMsg" class="sync-msg"></div>
+      <div class="modal-actions">
+        <button id="copySyncBtn" class="btn-ghost">Copy Sync Code</button>
+        <button id="importSyncBtn" class="btn-primary">Import &amp; Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Sprint Confirmation Modal -->
+  <div id="resetModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="resetModalTitle" class="modal-title">Reset Sprint Progress?</h3>
+        <button id="closeResetModalBtn" class="icon-square-btn" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc">
+        This will uncheck all 12 backlog tutorials, New Tuts, Uni &amp; Gym sessions, and reset your completed Pomodoro counter back to zero.
+      </p>
+      <div class="modal-actions">
+        <button id="cancelResetBtn" class="btn-ghost">Cancel</button>
+        <button id="confirmResetBtn" class="btn-danger">Yes, Reset Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN APPLICATION SHELL
+       ========================================================================= -->
+  <div class="app-shell">
+
+    <!-- 1. TOP MISSION CONTROL HEADER -->
+    <header class="glass-panel mission-header">
+      <div class="header-top-row">
+        <div>
+          <div class="brand-eyebrow">
+            <span class="chip-live"><span class="pulse-dot"></span> Rescue Mission Active</span>
+            <span class="chip-date">GUC MET • Nov 24 – Dec 1</span>
+          </div>
+          <h1 class="mission-title">
+            MET Backlog Rescue Sprint <span class="gradient-text">(Nov 24 – Dec 1)</span>
+          </h1>
+          <p class="mission-subtitle">
+            Strict Priority Order: <strong style="color:var(--cs-color)">#1 CS</strong> → <strong style="color:var(--elct-color)">#2 ELCT</strong> → <strong style="color:var(--math-color)">#3 MATH</strong> → <strong style="color:var(--phys-color)">#4 PHYSICS</strong> • Zero new backlog ("Stop the Bleeding")
+          </p>
+        </div>
+
+        <!-- Main Backlog Rescue Counter -->
+        <div id="rescueHeroBox" class="rescue-hero-box">
+          <div class="rescue-counter-row">
+            <span class="rescue-label">Backlog Rescue Progress</span>
+            <div id="rescueBigCount" class="rescue-big-count">12 Tuts Remaining</div>
+          </div>
+          <div class="rescue-bar-track">
+            <div id="rescueBarFill" class="rescue-bar-fill"></div>
+          </div>
+          <div class="rescue-meta-row">
+            <span>Cleared: <strong id="rescueClearedNum">0</strong> / <strong>12</strong> Backlog Tuts</span>
+            <span>Sprint Overall: <strong id="overallPctText">0%</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Subject Priority Pills (Strict Order) -->
+      <div id="priorityPillsGrid" class="priority-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Live Goal Rings Row + AI Course Status Pill -->
+      <div id="goalsRow" class="goals-row">
+        <!-- Rendered dynamically -->
+      </div>
+    </header>
+
+    <!-- 2. CONTROLS & FILTER BAR -->
+    <section class="glass-panel controls-bar" aria-label="Dashboard controls">
+      <div class="controls-top-line">
+        <div class="controls-group">
+          <!-- Run Week vs Football Week Toggle -->
+          <div class="segmented-switch" id="weekModeSwitch" role="group" aria-label="Cardio week mode">
+            <div id="weekModeThumb" class="segmented-thumb" style="background:linear-gradient(135deg,#2dd4bf,#a3e635);"></div>
+            <button id="btnRunWeek" class="segmented-btn active" type="button">⚡ Run Week</button>
+            <button id="btnFootballWeek" class="segmented-btn" type="button">⚽ Football Week</button>
+          </div>
+
+          <!-- Day Focus View vs Full 8-Day Overview Toggle -->
+          <div class="segmented-switch" id="viewModeSwitch" role="group" aria-label="Schedule layout view">
+            <div id="viewModeThumb" class="segmented-thumb" style="background:#f8fafc;"></div>
+            <button id="btnDayView" class="segmented-btn active" type="button">Day Focus View</button>
+            <button id="btnOverviewView" class="segmented-btn" type="button">Full 8-Day Overview</button>
+          </div>
+        </div>
+
+        <div class="controls-group">
+          <!-- Hide Skipped Lectures Toggle -->
+          <button id="btnHideSkipped" class="ctrl-btn" type="button" aria-pressed="false">
+            <span id="hideSkippedIcon">👁️</span>
+            <span id="hideSkippedLabel">Hide Skipped Lectures</span>
+          </button>
+
+          <!-- Pomodoro Panel Collapse/Expand -->
+          <button id="btnTogglePomo" class="ctrl-btn pomo-toggle-btn" type="button">
+            <span>⏱️</span>
+            <span id="togglePomoLabel">Hide Timer</span>
+          </button>
+
+          <!-- Sync Code Button -->
+          <button id="btnOpenSync" class="ctrl-btn" type="button">
+            <span>🔄</span>
+            <span>Sync Code</span>
+          </button>
+
+          <!-- Reset Button -->
+          <button id="btnOpenReset" class="ctrl-btn danger-btn" type="button">
+            <span>↺</span>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Chips Row -->
+      <div id="filterRow" class="filter-row" role="tablist" aria-label="Filter schedule items">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- 3. MAIN WORKSPACE: SCHEDULE (LEFT) + INTEGRATED POMODORO (RIGHT) -->
+    <div id="workspace" class="workspace">
+
+      <!-- SCHEDULE COLUMN -->
+      <main class="schedule-col">
+        <!-- DAY FOCUS VIEW -->
+        <div id="dayFocusContainer">
+          <!-- 8 Day Date Tabs -->
+          <div id="dayTabs" class="day-tabs" role="tablist" aria-label="Sprint days"></div>
+
+          <!-- Active Day Summary Banner -->
+          <div id="dayBanner" class="glass-panel day-banner"></div>
+
+          <!-- Staggered Task Cards -->
+          <div id="dayCardsStack" class="cards-stack"></div>
+        </div>
+
+        <!-- FULL 8-DAY OVERVIEW -->
+        <div id="overviewContainer" class="overview-grid hidden"></div>
+      </main>
+
+      <!-- INTEGRATED POMODORO TIMER PANEL -->
+      <aside id="pomoCol" class="pomo-col" aria-label="Pomodoro Focus Timer">
+        <div id="pomoPanel" class="glass-panel pomo-panel">
+          <div class="pomo-head">
+            <div class="pomo-head-left">
+              <div class="pomo-icon-badge" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="13" r="8"></circle>
+                  <path d="M12 9v4l2.5 2.5"></path>
+                  <path d="M9 2h6"></path>
+                </svg>
+              </div>
+              <div>
+                <h2>Pomodoro Focus</h2>
+                <div id="pomoStatusLine" class="pomo-sub">Ready to crush backlog</div>
+              </div>
+            </div>
+
+            <button id="btnSoundToggle" class="icon-square-btn" title="Toggle Web Audio Chime" aria-label="Toggle chime sound">
+              <span id="soundIcon">🔔</span>
+            </button>
+          </div>
+
+          <!-- Active Linked Task -->
+          <div class="pomo-active-task">
+            <div class="pomo-task-text-wrap">
+              <div class="pomo-task-label">Active Focus Task</div>
+              <div id="pomoActiveTaskName" class="pomo-task-name">Click "Focus ▶" on any study card</div>
+            </div>
+            <button id="btnClearActiveTask" class="icon-square-btn hidden" title="Clear active task" style="width:28px;height:28px;font-size:11px;">✕</button>
+          </div>
+
+          <!-- Work Presets -->
+          <div class="pomo-presets">
+            <button class="preset-btn active" data-preset="deep" type="button">Deep 50/10</button>
+            <button class="preset-btn" data-preset="classic" type="button">Classic 25/5</button>
+            <button class="preset-btn" data-preset="quiz" type="button">Quiz 15/3</button>
+          </div>
+
+          <!-- Break Presets -->
+          <div class="pomo-breaks">
+            <button class="preset-btn" data-preset="shortBreak" type="button">Short Break 5m</button>
+            <button class="preset-btn" data-preset="longBreak" type="button">Long Break 10m</button>
+          </div>
+
+          <!-- Animated SVG Circular Countdown Ring -->
+          <div class="pomo-ring-stage">
+            <div id="pomoRingShell" class="pomo-ring-shell">
+              <svg class="pomo-ring-svg" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="pomoGradWork" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f43f5e" />
+                    <stop offset="100%" stop-color="#fb923c" />
+                  </linearGradient>
+                  <linearGradient id="pomoGradBreak" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#10b981" />
+                    <stop offset="100%" stop-color="#38bdf8" />
+                  </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10" />
+                <circle id="pomoRingFg" class="pomo-ring-fg" cx="100" cy="100" r="86" fill="none" stroke="url(#pomoGradWork)" stroke-width="10" stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="0" />
+              </svg>
+              <div class="pomo-ring-center">
+                <div id="pomoModeLabel" class="pomo-mode-label">Deep Work</div>
+                <div id="pomoDigits" class="pomo-digits">50:00</div>
+                <div id="pomoCycleHint" class="pomo-cycle-hint">50m focus • 10m break</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Start / Pause / Reset Controls -->
+          <div class="pomo-controls">
+            <button id="btnPomoReset" class="pomo-secondary-btn" title="Reset Timer" aria-label="Reset timer" type="button">↺</button>
+            <button id="btnPomoStartPause" class="pomo-start-btn" type="button">
+              <span id="pomoStartIcon">▶</span>
+              <span id="pomoStartLabel">Start Focus</span>
+            </button>
+            <button id="btnPomoSkip" class="pomo-secondary-btn" title="Switch Focus / Break" aria-label="Skip phase" type="button">⏭</button>
+          </div>
+
+          <!-- Live Pomodoro Session Stats -->
+          <div class="pomo-stats-grid">
+            <div class="pomo-stat-tile">
+              <div class="pomo-stat-label">Completed Sessions</div>
+              <div id="pomoCountStat" class="pomo-stat-num" style="color:#fda4af;">0</div>
+            </div>
+            <div class="pomo-stat-tile">
+              <div class="pomo-stat-label">Total Focus Time</div>
+              <div id="pomoMinsStat" class="pomo-stat-num" style="color:#7dd3fc;">0m</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="app-footer">
+      <span>MET Backlog Rescue Sprint • Saved automatically to <code style="font-family:var(--font-mono);color:#94a3b8;">met_rescue_sprint_v1</code></span>
+      <span>Priority: CS → ELCT → MATH → PHYSICS • Stop the Bleeding</span>
+    </footer>
+  </div>
+
+  <!-- =========================================================================
+       APPLICATION LOGIC, DATA MODEL, POMODORO ENGINE & CONFETTI CANVAS
+       ========================================================================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* =======================================================================
+         1. EXACT 8-DAY SPRINT SCHEDULE DATA (Nov 24 – Dec 1)
+         ======================================================================= */
+      const STORAGE_KEY = 'met_rescue_sprint_v1';
+      const DEFAULT_TITLE = 'MET Backlog Rescue Sprint (Nov 24 – Dec 1)';
+
+      const SUBJECT_PRIORITIES = [
+        { key: 'CS', rank: '#1', label: 'CS', target: 2, deadline: 'Quiz Tue AM', accent: 'var(--cs-color)', bg: 'var(--cs-bg)', border: 'var(--cs-border)', glow: 'rgba(255,92,108,0.28)' },
+        { key: 'ELCT', rank: '#2', label: 'ELCT', target: 3, deadline: 'Quiz Thu', accent: 'var(--elct-color)', bg: 'var(--elct-bg)', border: 'var(--elct-border)', glow: 'rgba(251,146,60,0.28)' },
+        { key: 'MATH', rank: '#3', label: 'MATH', target: 4, deadline: 'Clear by Sat', accent: 'var(--math-color)', bg: 'var(--math-bg)', border: 'var(--math-border)', glow: 'rgba(96,165,250,0.28)' },
+        { key: 'PHYSICS', rank: '#4', label: 'PHYSICS', target: 3, deadline: 'Clear by Mon', accent: 'var(--phys-color)', bg: 'var(--phys-bg)', border: 'var(--phys-border)', glow: 'rgba(45,212,191,0.28)' },
+      ];
+
+      const SPRINT_DAYS = [
+        {
+          id: 'day1',
+          dayNum: 'Day 1',
+          dateLabel: 'Tue, Nov 24',
+          month: 10, // 0-indexed: 10 = Nov
+          date: 24,
+          tag: 'CS QUIZ + ELCT START',
+          accent: '#ff5c6c',
+          summary: 'Zero both CS backlog tuts before the morning quiz, attend 1st–2nd periods, reset with Coffee + LEGS, then start ELCT #1.',
+          items: [
+            {
+              id: 'd1-cs-1',
+              type: 'backlog',
+              subject: 'CS',
+              priority: '#1',
+              time: 'Morning Pre-Quiz Sprint',
+              duration: '1.5h',
+              title: 'CS Backlog Tut #1',
+              desc: 'Core concepts & practice problems before quiz.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd1-cs-2',
+              type: 'backlog',
+              subject: 'CS',
+              priority: '#1',
+              time: 'Pre-Quiz Wrap-up',
+              duration: '1.5h',
+              title: 'CS Backlog Tut #2',
+              desc: 'Finish all CS backlog — CS 2/2 ZEROED!',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd1-cs-quiz',
+              type: 'quiz',
+              time: 'Morning',
+              title: 'CS Quiz',
+              desc: 'URGENT — Priority #1 Deadline. Walk in with 2/2 CS backlog cleared.',
+            },
+            {
+              id: 'd1-uni-1',
+              type: 'uni',
+              time: '1st Period',
+              room: 'C4.321',
+              title: 'ELCT 301 Lab',
+              desc: 'On-campus practical electronics lab.',
+            },
+            {
+              id: 'd1-uni-2',
+              type: 'uni',
+              time: '2nd Period',
+              room: 'C6.204',
+              title: 'PHYSt 301 Tut',
+              desc: 'On-campus physics tutorial.',
+            },
+            {
+              id: 'd1-skip-1',
+              type: 'skipped',
+              time: '3rd & 4th Period',
+              room: 'H12',
+              title: 'MATH 301 Lec & PHYSt 301 Lec',
+              desc: 'Skipped — leave campus early to decompress.',
+            },
+            {
+              id: 'd1-gym',
+              type: 'sports',
+              sportGoal: 'gym',
+              icon: 'coffee-gym',
+              time: 'Afternoon',
+              title: 'Coffee Decompress + Gym: LEGS (PPLU)',
+              desc: 'Reset after quiz & uni before evening ELCT block.',
+            },
+            {
+              id: 'd1-elct-1',
+              type: 'backlog',
+              subject: 'ELCT',
+              priority: '#2',
+              time: 'Evening',
+              duration: '2h',
+              title: 'ELCT Backlog Tut #1',
+              desc: "Kick off prep for Thursday's ELCT Quiz.",
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd1-new-1',
+              type: 'newtut',
+              time: 'Night',
+              duration: '45m',
+              title: "NEW Today's PHYSt 301 Tut",
+              desc: 'Quick 45m lock-in — Stop the bleeding!',
+              focusable: true,
+              recommendedPreset: 'classic',
+            },
+          ],
+        },
+        {
+          id: 'day2',
+          dayNum: 'Day 2',
+          dateLabel: 'Wed, Nov 25',
+          month: 10,
+          date: 25,
+          tag: 'HEAVY UNI + ELCT QUIZ EVE',
+          accent: '#fb923c',
+          summary: 'Longest campus day (1st–4th including CS Lecture), recharge with Coffee + UPPER, then zero all remaining ELCT backlog.',
+          items: [
+            {
+              id: 'd2-uni-1',
+              type: 'uni',
+              time: '1st Period',
+              room: 'C2.305',
+              title: 'DE 202 Tut',
+              desc: 'On-campus German tutorial.',
+            },
+            {
+              id: 'd2-uni-2',
+              type: 'uni',
+              time: '2nd Period',
+              room: 'C6.204',
+              title: 'CSEN 301 Tut',
+              desc: 'On-campus CS tutorial.',
+            },
+            {
+              id: 'd2-uni-3',
+              type: 'uni',
+              time: '3rd Period',
+              room: 'C3.309',
+              title: 'CSEN 301 Lab',
+              desc: 'On-campus CS coding lab.',
+            },
+            {
+              id: 'd2-uni-4',
+              type: 'uni',
+              time: '4th Period',
+              room: 'H12',
+              title: 'CSEN 301 Lecture (Attending CS)',
+              desc: 'Attended live CS lecture on campus.',
+            },
+            {
+              id: 'd2-gym',
+              type: 'sports',
+              sportGoal: 'gym',
+              icon: 'coffee-gym',
+              time: 'Late Afternoon',
+              title: 'Coffee Decompress + Gym: UPPER (PPLU)',
+              desc: 'Recharge after longest campus day.',
+            },
+            {
+              id: 'd2-elct-2',
+              type: 'backlog',
+              subject: 'ELCT',
+              priority: '#2',
+              time: 'Evening',
+              duration: '1.5h',
+              title: 'ELCT Backlog Tut #2',
+              desc: "Solve sheet problems by hand for tomorrow's quiz.",
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd2-elct-3',
+              type: 'backlog',
+              subject: 'ELCT',
+              priority: '#2',
+              time: 'Night',
+              duration: '1.5h',
+              title: 'ELCT Backlog Tut #3',
+              desc: 'Complete ALL ELCT backlog — ELCT 3/3 ZEROED!',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd2-new-1',
+              type: 'newtut',
+              time: 'Night Recap',
+              duration: '30m',
+              title: 'NEW Wed CSEN & DE Tuts',
+              desc: 'Quick 30m notes scan; deep review on Friday.',
+              focusable: true,
+              recommendedPreset: 'classic',
+            },
+          ],
+        },
+        {
+          id: 'day3',
+          dayNum: 'Day 3',
+          dateLabel: 'Thu, Nov 26',
+          month: 10,
+          date: 26,
+          tag: 'ELCT QUIZ DAY + HANGOUT',
+          accent: '#f43f5e',
+          summary: 'Use the 2nd Period campus break for ELCT warm-up, crush the ELCT Quiz, lock in new Tuts, then enjoy a guilt-free Friends Night.',
+          items: [
+            {
+              id: 'd3-uni-1',
+              type: 'uni',
+              time: '1st Period',
+              room: 'C6.105',
+              title: 'PHYSp 301 Lab',
+              desc: 'On-campus practical physics lab.',
+            },
+            {
+              id: 'd3-skip-1',
+              type: 'skipped',
+              time: '2nd Period',
+              room: 'H17',
+              title: 'ELCT 301 Lecture',
+              desc: 'Skipped → converted into quiet campus study break.',
+            },
+            {
+              id: 'd3-quizprep',
+              type: 'quizprep',
+              time: '2nd Period Break',
+              duration: '1h',
+              title: 'ELCT Final Quiz Warm-up & Formula Sheet',
+              desc: 'Quiet campus spot — sharpen formulas & tricky circuits.',
+              focusable: true,
+              recommendedPreset: 'quiz',
+            },
+            {
+              id: 'd3-elct-quiz',
+              type: 'quiz',
+              time: 'Thursday',
+              title: 'ELCT Quiz',
+              desc: 'URGENT — Walking in with 3/3 ELCT cleared!',
+            },
+            {
+              id: 'd3-uni-2',
+              type: 'uni',
+              time: '3rd Period',
+              room: 'C5.311',
+              title: 'MATH 301 Tut',
+              desc: 'On-campus math tutorial.',
+            },
+            {
+              id: 'd3-uni-3',
+              type: 'uni',
+              time: '4th Period',
+              room: 'C2.208',
+              title: 'DE 202 Tut',
+              desc: 'Final campus class of the week.',
+            },
+            {
+              id: 'd3-new-1',
+              type: 'newtut',
+              time: 'Afternoon',
+              duration: '1h',
+              title: "NEW Today's MATH 301 & DE 202 Tuts",
+              desc: 'Lock in 100% before heading out.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd3-rest',
+              type: 'social',
+              time: 'Evening & Night',
+              title: 'Rest Day (No Gym) + Friends Hangout Night',
+              desc: 'Well-earned decompression! Zero textbooks tonight.',
+            },
+          ],
+        },
+        {
+          id: 'day4',
+          dayNum: 'Day 4',
+          dateLabel: 'Fri, Nov 27',
+          month: 10,
+          date: 27,
+          tag: 'MATH ATTACK DAY 1',
+          accent: '#60a5fa',
+          summary: 'No campus classes — smash MATH Backlog #1 & #2 early, hit Squash #1 (plus Football in Football Week), and close Wed CSEN & DE.',
+          items: [
+            {
+              id: 'd4-math-1',
+              type: 'backlog',
+              subject: 'MATH',
+              priority: '#3',
+              time: 'Morning',
+              duration: '2h',
+              title: 'MATH Backlog Tut #1',
+              desc: 'Fresh mind, full problem solving from scratch.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd4-math-2',
+              type: 'backlog',
+              subject: 'MATH',
+              priority: '#3',
+              time: 'Midday',
+              duration: '2h',
+              title: 'MATH Backlog Tut #2',
+              desc: 'Build Math momentum while concepts are hot.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd4-squash-1',
+              type: 'sports',
+              sportGoal: 'squash',
+              icon: 'coffee-squash',
+              time: 'Afternoon',
+              title: 'Coffee + Squash Session #1',
+              desc: 'High-energy court session to reset between study blocks.',
+              footballNote: 'Football Week Recovery Note: Keep Squash intensity light to save legs for tonight’s 1h Football match.',
+            },
+            {
+              id: 'd4-football',
+              type: 'sports',
+              sportGoal: 'cardio',
+              weekModeOnly: 'football',
+              icon: 'football',
+              time: 'Evening',
+              duration: '1h',
+              title: 'Weekly Football Booking (1h)',
+              desc: 'Football Week match night — hydrate and fuel carbs afterward!',
+            },
+            {
+              id: 'd4-new-1',
+              type: 'newtut',
+              time: 'Evening',
+              duration: '1h',
+              title: 'NEW Wed CSEN 301 & DE 202 Full Lock-in',
+              desc: 'Close all current-week new material cleanly.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+          ],
+        },
+        {
+          id: 'day5',
+          dayNum: 'Day 5',
+          dateLabel: 'Sat, Nov 28',
+          month: 10,
+          date: 28,
+          tag: 'MATH ZEROED DAY!',
+          accent: '#60a5fa',
+          summary: 'Campus Free Day — clear MATH #3 & #4 to zero out all Math backlog, train PUSH fresh, and preview Sunday’s tutorials.',
+          items: [
+            {
+              id: 'd5-free',
+              type: 'uni-free',
+              time: 'All Day',
+              title: 'Campus Free Day',
+              desc: 'Zero campus commute — maximum deep-work focus window.',
+            },
+            {
+              id: 'd5-run',
+              type: 'sports',
+              sportGoal: 'cardio',
+              weekModeOnly: 'run',
+              icon: 'run',
+              time: 'Early Morning',
+              duration: '25 min',
+              title: 'Zone 2 Easy Run',
+              desc: '25 min conversational pace — clears your head before Math.',
+            },
+            {
+              id: 'd5-math-3',
+              type: 'backlog',
+              subject: 'MATH',
+              priority: '#3',
+              time: 'Morning',
+              duration: '2h',
+              title: 'MATH Backlog Tut #3',
+              desc: 'Stay strict on order — solve key sheet problems by hand.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd5-math-4',
+              type: 'backlog',
+              subject: 'MATH',
+              priority: '#3',
+              time: 'Early Afternoon',
+              duration: '2h',
+              title: 'MATH Backlog Tut #4',
+              desc: 'MATH 4/4 ZEROED! Three subjects down, only Physics left.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd5-gym',
+              type: 'sports',
+              sportGoal: 'gym',
+              icon: 'coffee-gym',
+              time: 'Afternoon',
+              title: 'Coffee Decompress + Gym: PUSH (PPLU)',
+              desc: 'Chest, Shoulders & Triceps with full weekend energy.',
+            },
+            {
+              id: 'd5-new-1',
+              type: 'newtut',
+              time: 'Evening',
+              duration: '1h',
+              title: 'UPCOMING Preview — Sunday SM 101, ELCT 301 & MATH 301 Tuts',
+              desc: 'Quick skim so tomorrow’s tutorials feel effortless.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+          ],
+        },
+        {
+          id: 'day6',
+          dayNum: 'Day 6',
+          dateLabel: 'Sun, Nov 29',
+          month: 10,
+          date: 29,
+          tag: 'PHYSICS ATTACK BEGINS',
+          accent: '#2dd4bf',
+          summary: 'Sleep in past 1st Period, lock in ELCT & SM during the 4th Period campus break, hit PULL, then launch PHYSICS Backlog #1.',
+          items: [
+            {
+              id: 'd6-skip-1',
+              type: 'skipped',
+              time: '1st Period',
+              room: 'H12',
+              title: 'PHYSt 301 Lecture',
+              desc: 'Skipped — sleep in for physical & mental recovery.',
+            },
+            {
+              id: 'd6-uni-1',
+              type: 'uni',
+              time: '2nd Period',
+              room: 'B4.101',
+              title: 'SM 101 Tut',
+              desc: 'On-campus tutorial session.',
+            },
+            {
+              id: 'd6-uni-2',
+              type: 'uni',
+              time: '3rd Period',
+              room: 'C5.305',
+              title: 'ELCT 301 Tut',
+              desc: 'On-campus electrical engineering tutorial.',
+            },
+            {
+              id: 'd6-skip-2',
+              type: 'skipped',
+              time: '4th Period',
+              room: 'H18',
+              title: 'MATH 301 Lecture',
+              desc: 'Skipped → converted into productive campus study break.',
+            },
+            {
+              id: 'd6-new-1',
+              type: 'newtut',
+              time: '4th Period Break',
+              duration: '1.5h',
+              title: "NEW Lock-in Today's ELCT & SM Tuts on Campus",
+              desc: 'Zero new backlog! Finish right on campus before 5th Period.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd6-uni-3',
+              type: 'uni',
+              time: '5th Period',
+              room: 'C5.205',
+              title: 'MATH 301 Tut',
+              desc: 'On-campus math tutorial.',
+            },
+            {
+              id: 'd6-gym',
+              type: 'sports',
+              sportGoal: 'gym',
+              icon: 'coffee-gym',
+              time: 'Late Afternoon',
+              title: 'Coffee Decompress + Gym: PULL (PPLU)',
+              desc: 'Back, Biceps & Rear Delts — keeps legs fresh for Monday Squash.',
+            },
+            {
+              id: 'd6-phys-1',
+              type: 'backlog',
+              subject: 'PHYSICS',
+              priority: '#4',
+              time: 'Evening',
+              duration: '2h',
+              title: 'PHYSICS Backlog Tut #1',
+              desc: 'Final backlog boss starts! Master core derivations & problems.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd6-new-2',
+              type: 'newtut',
+              time: 'Night',
+              duration: '45m',
+              title: "NEW Today's MATH 301 Tut Lock-in",
+              desc: 'Seal today’s math tutorial before sleep.',
+              focusable: true,
+              recommendedPreset: 'classic',
+            },
+          ],
+        },
+        {
+          id: 'day7',
+          dayNum: 'Day 7',
+          dateLabel: 'Mon, Nov 30',
+          month: 10,
+          date: 30,
+          tag: 'BACKLOG ZERO DAY! 🏆',
+          accent: '#10b981',
+          summary: 'Campus Free Day — finish PHYSICS #2 & #3 to hit 0/12 backlog, celebrate with Squash #2, and prep cleanly for Tuesday.',
+          items: [
+            {
+              id: 'd7-free',
+              type: 'uni-free',
+              time: 'All Day',
+              title: 'Campus Free Day',
+              desc: 'Clear runway to defeat the final two backlog tutorials.',
+            },
+            {
+              id: 'd7-phys-2',
+              type: 'backlog',
+              subject: 'PHYSICS',
+              priority: '#4',
+              time: 'Morning',
+              duration: '2h',
+              title: 'PHYSICS Backlog Tut #2',
+              desc: 'Penultimate backlog tutorial — stay locked in!',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd7-phys-3',
+              type: 'backlog',
+              subject: 'PHYSICS',
+              priority: '#4',
+              time: 'Midday',
+              duration: '2h',
+              title: 'PHYSICS Backlog Tut #3',
+              desc: 'ALL 12/12 BACKLOG TUTS CLEARED! AI Course unlocked!',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd7-squash-2',
+              type: 'sports',
+              sportGoal: 'squash',
+              icon: 'coffee-squash',
+              time: 'Afternoon',
+              title: 'Coffee + Squash Session #2',
+              desc: 'Victory match! Fuel carbs well tonight for Tuesday LEGS.',
+            },
+            {
+              id: 'd7-new-1',
+              type: 'newtut',
+              time: 'Evening',
+              duration: '1h',
+              title: 'UPCOMING Prep — Tue ELCT Lab & PHYSt Tut + Weak Spots Recap',
+              desc: 'Enter December completely caught up and ahead.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+          ],
+        },
+        {
+          id: 'day8',
+          dayNum: 'Day 8',
+          dateLabel: 'Tue, Dec 1',
+          month: 11, // 11 = Dec
+          date: 1,
+          tag: 'BUFFER & AI UNLOCK',
+          accent: '#38bdf8',
+          summary: 'Clean slate day: early campus finish, Coffee + LEGS, lock in new PHYSt Tut, and use evening as Buffer or resume Andrew Ng AI Course!',
+          items: [
+            {
+              id: 'd8-uni-1',
+              type: 'uni',
+              time: '1st Period',
+              room: 'C4.321',
+              title: 'ELCT 301 Lab',
+              desc: 'On-campus electronics lab.',
+            },
+            {
+              id: 'd8-uni-2',
+              type: 'uni',
+              time: '2nd Period',
+              room: 'C6.204',
+              title: 'PHYSt 301 Tut',
+              desc: 'On-campus physics tutorial.',
+            },
+            {
+              id: 'd8-skip-1',
+              type: 'skipped',
+              time: '3rd & 4th Period',
+              room: 'H12',
+              title: 'MATH 301 & PHYSt 301 Lectures',
+              desc: 'Skipped — finish campus early.',
+            },
+            {
+              id: 'd8-gym',
+              type: 'sports',
+              sportGoal: 'gym',
+              icon: 'coffee-gym',
+              time: 'Afternoon',
+              title: 'Coffee Decompress + Gym: LEGS (PPLU)',
+              desc: 'Full lower-body session to kick off December strong.',
+            },
+            {
+              id: 'd8-new-1',
+              type: 'newtut',
+              time: 'Evening',
+              duration: '1h',
+              title: "NEW Today's PHYSt 301 Tut Lock-in",
+              desc: 'Keep the zero-backlog streak alive.',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+            {
+              id: 'd8-buffer',
+              type: 'buffer',
+              time: 'Evening',
+              duration: '1.5h',
+              title: 'Overflow Buffer OR Resume AI Course (Andrew Ng ML)',
+              desc: 'Zero backlog? Celebrate by jumping back into Andrew Ng ML Specialization!',
+              focusable: true,
+              recommendedPreset: 'deep',
+            },
+          ],
+        },
+      ];
+
+      const FILTERS = [
+        { id: 'all', label: 'All', dot: '#f8fafc' },
+        { id: 'backlog', label: 'Backlog (12)', dot: '#ff5c6c' },
+        { id: 'newtut', label: 'New Tuts', dot: '#a78bfa' },
+        { id: 'quizzes', label: 'Quizzes', dot: '#f43f5e' },
+        { id: 'uni', label: 'Uni', dot: '#34d399' },
+        { id: 'sports', label: 'Gym & Sports', dot: '#a3e635' },
+      ];
+
+      const POMO_PRESETS = {
+        deep: { label: 'Deep Work', minutes: 50, isBreak: false, hint: '50m focus • 10m break', nextBreak: 'longBreak' },
+        classic: { label: 'Classic', minutes: 25, isBreak: false, hint: '25m focus • 5m break', nextBreak: 'shortBreak' },
+        quiz: { label: 'Quiz Sprint', minutes: 15, isBreak: false, hint: '15m sprint • 3m break', nextBreak: 'shortBreak' },
+        shortBreak: { label: 'Short Break', minutes: 5, isBreak: true, hint: '5m breather • hydrate', nextBreak: null },
+        longBreak: { label: 'Long Break', minutes: 10, isBreak: true, hint: '10m reset • stretch', nextBreak: null },
+      };
+
+      /* =======================================================================
+         2. STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE
+         ======================================================================= */
+      function detectTodayDayId() {
+        try {
+          const now = new Date();
+          const m = now.getMonth();
+          const d = now.getDate();
+          const found = SPRINT_DAYS.find((day) => day.month === m && day.date === d);
+          return found ? found.id : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      const detectedTodayId = detectTodayDayId();
+
+      const state = {
+        completed: {},
+        weekMode: 'run', // 'run' | 'football'
+        viewMode: 'day', // 'day' | 'overview'
+        hideSkipped: false,
+        activeDayId: detectedTodayId || 'day1',
+        activeFilter: 'all',
+        pomoCollapsed: false,
+
+        // Pomodoro persisted & runtime state
+        pomodoros: 0,
+        focusMinutes: 0,
+        pomoPreset: 'deep',
+        lastWorkPreset: 'deep',
+        pomoTotalSec: 50 * 60,
+        pomoRemainingSec: 50 * 60,
+        pomoRunning: false,
+        soundEnabled: true,
+        activeTaskId: null,
+        activeTaskTitle: null,
+
+        // Track previous completion counts to trigger milestone celebrations cleanly
+        prevSubjectCleared: { CS: false, ELCT: false, MATH: false, PHYSICS: false },
+        prevAllBacklogCleared: false,
+      };
+
+      let pomoInterval = null;
+      let audioCtx = null;
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          if (saved && typeof saved === 'object') {
+            if (saved.completed && typeof saved.completed === 'object') state.completed = saved.completed;
+            if (saved.weekMode === 'run' || saved.weekMode === 'football') state.weekMode = saved.weekMode;
+            if (typeof saved.hideSkipped === 'boolean') state.hideSkipped = saved.hideSkipped;
+            if (typeof saved.pomodoros === 'number') state.pomodoros = saved.pomodoros;
+            if (typeof saved.focusMinutes === 'number') state.focusMinutes = saved.focusMinutes;
+            if (typeof saved.soundEnabled === 'boolean') state.soundEnabled = saved.soundEnabled;
+            if (saved.pomoPreset && POMO_PRESETS[saved.pomoPreset]) {
+              state.pomoPreset = saved.pomoPreset;
+              if (!POMO_PRESETS[saved.pomoPreset].isBreak) state.lastWorkPreset = saved.pomoPreset;
+            }
+          }
+        } catch (err) {
+          console.warn('Could not load saved sprint state:', err);
+        }
+
+        // Sync timer to preset
+        const mins = POMO_PRESETS[state.pomoPreset].minutes;
+        state.pomoTotalSec = mins * 60;
+        state.pomoRemainingSec = mins * 60;
+
+        // Seed milestone trackers without triggering confetti on page load
+        const metrics = computeMetrics();
+        SUBJECT_PRIORITIES.forEach((sp) => {
+          state.prevSubjectCleared[sp.key] = metrics.subjects[sp.key].done >= sp.target;
+        });
+        state.prevAllBacklogCleared = metrics.backlogRemaining === 0;
+      }
+
+      function saveState() {
+        try {
+          const payload = {
+            completed: state.completed,
+            weekMode: state.weekMode,
+            hideSkipped: state.hideSkipped,
+            pomodoros: state.pomodoros,
+            focusMinutes: state.focusMinutes,
+            soundEnabled: state.soundEnabled,
+            pomoPreset: state.pomoPreset,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (err) {
+          console.warn('Could not persist sprint state:', err);
+        }
+      }
+
+      /* =======================================================================
+         3. PURE JS CANVAS CONFETTI CELEBRATION ENGINE
+         ======================================================================= */
+      const confettiCanvas = document.getElementById('confettiCanvas');
+      const confettiCtx = confettiCanvas.getContext('2d');
+      let confettiPieces = [];
+      let confettiRAF = null;
+
+      function resizeConfettiCanvas() {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeConfettiCanvas);
+      resizeConfettiCanvas();
+
+      function burstConfetti(amount = 85) {
+        const colors = ['#ff5c6c', '#fb923c', '#60a5fa', '#2dd4bf', '#a78bfa', '#10b981', '#fbbf24'];
+        const originX = window.innerWidth * 0.5;
+        const originY = window.innerHeight * 0.3;
+
+        for (let i = 0; i < amount; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 3.5 + Math.random() * 10;
+          confettiPieces.push({
+            x: originX + (Math.random() - 0.5) * 220,
+            y: originY + (Math.random() - 0.5) * 80,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 4.5,
+            w: 6 + Math.random() * 6,
+            h: 4 + Math.random() * 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rot: Math.random() * 360,
+            vrot: (Math.random() - 0.5) * 14,
+            alpha: 1,
+            decay: 0.01 + Math.random() * 0.01,
+          });
+        }
+
+        if (!confettiRAF) runConfettiLoop();
+      }
+
+      function runConfettiLoop() {
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+        for (let i = confettiPieces.length - 1; i >= 0; i--) {
+          const p = confettiPieces[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.23;
+          p.vx *= 0.985;
+          p.rot += p.vrot;
+          p.alpha -= p.decay;
+
+          if (p.alpha <= 0) {
+            confettiPieces.splice(i, 1);
+            continue;
+          }
+
+          confettiCtx.save();
+          confettiCtx.globalAlpha = Math.max(0, p.alpha);
+          confettiCtx.translate(p.x, p.y);
+          confettiCtx.rotate((p.rot * Math.PI) / 180);
+          confettiCtx.fillStyle = p.color;
+          confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          confettiCtx.restore();
+        }
+
+        if (confettiPieces.length > 0) {
+          confettiRAF = requestAnimationFrame(runConfettiLoop);
+        } else {
+          confettiRAF = null;
+        }
+      }
+
+      /* =======================================================================
+         4. WEB AUDIO API CHIME (Zero external audio files)
+         ======================================================================= */
+      function playChime(isBreakEnd = false) {
+        if (!state.soundEnabled) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return;
+          if (!audioCtx) audioCtx = new Ctx();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
+          const notes = isBreakEnd ? [523.25, 659.25] : [523.25, 659.25, 783.99, 1046.5];
+          const now = audioCtx.currentTime;
+
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.13);
+
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.13);
+            gain.gain.exponentialRampToValueAtTime(0.14, now + idx * 0.13 + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.13 + 0.65);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + idx * 0.13);
+            osc.stop(now + idx * 0.13 + 0.7);
+          });
+        } catch (err) {
+          console.warn('Web Audio chime unavailable:', err);
+        }
+      }
+
+      /* =======================================================================
+         5. TOAST NOTIFICATIONS
+         ======================================================================= */
+      function showToast(title, body, emoji = '🏆', borderColor = 'rgba(16,185,129,0.45)') {
+        const stack = document.getElementById('toastStack');
+        const el = document.createElement('div');
+        el.className = 'toast-item';
+        el.style.borderColor = borderColor;
+        el.innerHTML = `
+          <div style="font-size:18px;line-height:1.2;flex-shrink:0;">${emoji}</div>
+          <div style="min-width:0;">
+            <div class="toast-title">${title}</div>
+            <div class="toast-body">${body}</div>
+          </div>
+        `;
+        stack.appendChild(el);
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(10px)';
+          setTimeout(() => el.remove(), 320);
+        }, 3600);
+      }
+
+      /* =======================================================================
+         6. HELPER FUNCTIONS & METRICS COMPUTATION
+         ======================================================================= */
+      function isItemActiveInWeekMode(item) {
+        if (item.weekModeOnly && item.weekModeOnly !== state.weekMode) return false;
+        return true;
+      }
+
+      function isItemCheckable(item) {
+        return item.type !== 'skipped' && item.type !== 'uni-free';
+      }
+
+      function matchesCurrentFilter(item) {
+        if (!isItemActiveInWeekMode(item)) return false;
+        if (item.type === 'skipped' && state.hideSkipped) return false;
+
+        switch (state.activeFilter) {
+          case 'all':
+            return true;
+          case 'backlog':
+            return item.type === 'backlog';
+          case 'newtut':
+            return item.type === 'newtut';
+          case 'quizzes':
+            return item.type === 'quiz' || item.type === 'quizprep';
+          case 'uni':
+            return item.type === 'uni' || item.type === 'skipped' || item.type === 'uni-free';
+          case 'sports':
+            return item.type === 'sports' || item.type === 'social';
+          default:
+            return true;
+        }
+      }
+
+      function getDayProgress(day) {
+        const checkable = day.items.filter((i) => isItemActiveInWeekMode(i) && isItemCheckable(i));
+        const done = checkable.filter((i) => Boolean(state.completed[i.id])).length;
+        return {
+          done,
+          total: checkable.length,
+          allDone: checkable.length > 0 && done === checkable.length,
+        };
+      }
+
+      function computeMetrics() {
+        const subjects = {
+          CS: { done: 0, total: 2 },
+          ELCT: { done: 0, total: 3 },
+          MATH: { done: 0, total: 4 },
+          PHYSICS: { done: 0, total: 3 },
+        };
+
+        let backlogDone = 0;
+        let newTutsDone = 0;
+        let newTutsTotal = 0;
+        let gymDone = 0;
+        let gymTotal = 0;
+        let squashDone = 0;
+        let squashTotal = 0;
+        let cardioDone = 0;
+        let cardioTotal = 0;
+        let overallDone = 0;
+        let overallTotal = 0;
+
+        SPRINT_DAYS.forEach((day) => {
+          day.items.forEach((item) => {
+            if (!isItemActiveInWeekMode(item)) return;
+            if (!isItemCheckable(item)) return;
+
+            overallTotal++;
+            const isDone = Boolean(state.completed[item.id]);
+            if (isDone) overallDone++;
+
+            if (item.type === 'backlog' && item.subject && subjects[item.subject]) {
+              if (isDone) {
+                subjects[item.subject].done++;
+                backlogDone++;
+              }
+            }
+            if (item.type === 'newtut') {
+              newTutsTotal++;
+              if (isDone) newTutsDone++;
+            }
+            if (item.sportGoal === 'gym') {
+              gymTotal++;
+              if (isDone) gymDone++;
+            }
+            if (item.sportGoal === 'squash') {
+              squashTotal++;
+              if (isDone) squashDone++;
+            }
+            if (item.sportGoal === 'cardio') {
+              cardioTotal++;
+              if (isDone) cardioDone++;
+            }
+          });
+        });
+
+        const backlogTotal = 12;
+        const backlogRemaining = Math.max(0, backlogTotal - backlogDone);
+        const overallPct = overallTotal > 0 ? Math.round((overallDone / overallTotal) * 100) : 0;
+
+        return {
+          subjects,
+          backlogDone,
+          backlogTotal,
+          backlogRemaining,
+          newTutsDone,
+          newTutsTotal,
+          gymDone,
+          gymTotal,
+          squashDone,
+          squashTotal,
+          cardioDone,
+          cardioTotal,
+          overallDone,
+          overallTotal,
+          overallPct,
+        };
+      }
+
+      /* =======================================================================
+         7. INLINE SVG ICONS & COLOR MAPPING FOR CARDS
+         ======================================================================= */
+      function getCardStyleMeta(item) {
+        if (item.type === 'backlog') {
+          const map = {
+            CS: { accent: 'var(--cs-color)', bg: 'var(--cs-bg)', border: 'var(--cs-border)', glow: 'rgba(255,92,108,0.28)', label: `Backlog • #1 CS` },
+            ELCT: { accent: 'var(--elct-color)', bg: 'var(--elct-bg)', border: 'var(--elct-border)', glow: 'rgba(251,146,60,0.28)', label: `Backlog • #2 ELCT` },
+            MATH: { accent: 'var(--math-color)', bg: 'var(--math-bg)', border: 'var(--math-border)', glow: 'rgba(96,165,250,0.28)', label: `Backlog • #3 MATH` },
+            PHYSICS: { accent: 'var(--phys-color)', bg: 'var(--phys-bg)', border: 'var(--phys-border)', glow: 'rgba(45,212,191,0.28)', label: `Backlog • #4 PHYSICS` },
+          };
+          return map[item.subject] || map.CS;
+        }
+        if (item.type === 'quiz') {
+          return { accent: 'var(--quiz-color)', bg: 'var(--quiz-bg)', border: 'var(--quiz-border)', glow: 'rgba(244,63,94,0.38)', label: 'URGENT QUIZ', urgent: true };
+        }
+        if (item.type === 'quizprep') {
+          return { accent: 'var(--quiz-color)', bg: 'var(--quiz-bg)', border: 'var(--quiz-border)', glow: 'rgba(244,63,94,0.26)', label: 'Quiz Warm-up' };
+        }
+        if (item.type === 'newtut') {
+          return { accent: 'var(--newtut-color)', bg: 'var(--newtut-bg)', border: 'var(--newtut-border)', glow: 'rgba(167,139,250,0.28)', label: 'Stop the Bleeding • New Tut' };
+        }
+        if (item.type === 'uni') {
+          return { accent: 'var(--uni-color)', bg: 'var(--uni-bg)', border: 'var(--uni-border)', glow: 'rgba(52,211,153,0.22)', label: 'Uni Class' };
+        }
+        if (item.type === 'uni-free') {
+          return { accent: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)', glow: 'rgba(52,211,153,0.15)', label: 'Campus Free' };
+        }
+        if (item.type === 'sports') {
+          return { accent: 'var(--sport-color)', bg: 'var(--sport-bg)', border: 'var(--sport-border)', glow: 'rgba(163,230,53,0.25)', label: item.icon === 'run' ? 'Zone 2 Run' : item.icon === 'football' ? 'Football' : 'Coffee + Sports' };
+        }
+        if (item.type === 'social') {
+          return { accent: 'var(--rest-color)', bg: 'var(--rest-bg)', border: 'var(--rest-border)', glow: 'rgba(251,191,36,0.25)', label: 'Rest & Hangout' };
+        }
+        if (item.type === 'buffer') {
+          return { accent: 'var(--buffer-color)', bg: 'var(--buffer-bg)', border: 'var(--buffer-border)', glow: 'rgba(56,189,248,0.3)', label: 'Buffer / AI Unlock' };
+        }
+        return { accent: '#94a3b8', bg: 'rgba(148,163,184,0.08)', border: 'rgba(148,163,184,0.22)', glow: 'transparent', label: 'Skipped Lecture' };
+      }
+
+      function getCardIconSVG(item) {
+        if (item.type === 'sports') {
+          if (item.icon === 'coffee-gym' || item.icon === 'coffee-squash') {
+            return `
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--coffee-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path class="steam-1" d="M8 5c0-1 .9-1.5.9-2.5" />
+                <path class="steam-2" d="M12.5 5c0-1 .9-1.5.9-2.5" />
+                <path d="M4.5 9h10.5v5.5a4.5 4.5 0 0 1-4.5 4.5H9a4.5 4.5 0 0 1-4.5-4.5V9z" />
+                <path d="M15 10.5h2a2 2 0 0 1 0 4h-2" />
+              </svg>`;
+          }
+          if (item.icon === 'run') {
+            return `<svg class="anim-float" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>`;
+          }
+          if (item.icon === 'football') {
+            return `<span class="anim-float" style="font-size:19px;line-height:1;">⚽</span>`;
+          }
+        }
+        if (item.type === 'quiz' || item.type === 'quizprep') {
+          return `<svg class="anim-float" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>`;
+        }
+        if (item.type === 'backlog') {
+          return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`;
+        }
+        if (item.type === 'newtut') {
+          return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`;
+        }
+        if (item.type === 'uni' || item.type === 'uni-free') {
+          return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
+        }
+        if (item.type === 'social') {
+          return `<svg class="anim-float" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+        }
+        if (item.type === 'buffer') {
+          return `<svg class="anim-float" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+        }
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>`;
+      }
+
+      /* =======================================================================
+         8. RENDER MISSION CONTROL HEADER (Counter, 4 Priority Pills, 6 Goals)
+         ======================================================================= */
+      function renderMissionControl(allowCelebrate = false) {
+        const m = computeMetrics();
+
+        // 1. Main Backlog Rescue Counter & Bar
+        const heroBox = document.getElementById('rescueHeroBox');
+        const bigCount = document.getElementById('rescueBigCount');
+        const barFill = document.getElementById('rescueBarFill');
+        const clearedNum = document.getElementById('rescueClearedNum');
+        const overallPctText = document.getElementById('overallPctText');
+
+        const rescuePct = Math.round((m.backlogDone / m.backlogTotal) * 100);
+        barFill.style.width = `${rescuePct}%`;
+        clearedNum.textContent = m.backlogDone;
+        overallPctText.textContent = `${m.overallPct}%`;
+
+        if (m.backlogRemaining === 0) {
+          heroBox.classList.add('mission-complete');
+          bigCount.classList.add('zeroed');
+          bigCount.textContent = '0 — MISSION COMPLETE! 🏆';
+        } else {
+          heroBox.classList.remove('mission-complete');
+          bigCount.classList.remove('zeroed');
+          bigCount.textContent = `${m.backlogRemaining} ${m.backlogRemaining === 1 ? 'Tut' : 'Tuts'} Remaining`;
+        }
+
+        // Celebrate hitting 0/12 backlog!
+        if (allowCelebrate && !state.prevAllBacklogCleared && m.backlogRemaining === 0) {
+          burstConfetti(140);
+          playChime(false);
+          showToast(
+            '0/12 — MISSION COMPLETE! 🏆',
+            'All 12 backlog tutorials conquered! AI Course is now UNLOCKED!',
+            '🚀',
+            'rgba(16,185,129,0.75)'
+          );
+        }
+        state.prevAllBacklogCleared = m.backlogRemaining === 0;
+
+        // 2. 4 Subject Priority Pills (Strict Order)
+        const priorityGrid = document.getElementById('priorityPillsGrid');
+        priorityGrid.innerHTML = SUBJECT_PRIORITIES.map((sp) => {
+          const stats = m.subjects[sp.key];
+          const pct = Math.round((stats.done / sp.target) * 100);
+          const isCleared = stats.done >= sp.target;
+
+          if (allowCelebrate && !state.prevSubjectCleared[sp.key] && isCleared) {
+            burstConfetti(90);
+            showToast(
+              `${sp.rank} ${sp.label} Backlog ZEROED!`,
+              `All ${sp.target}/${sp.target} ${sp.label} tutorials cleared — on to the next priority!`,
+              '✅',
+              'rgba(16,185,129,0.65)'
+            );
+          }
+          state.prevSubjectCleared[sp.key] = isCleared;
+
+          const isQuizUrgent = sp.key === 'CS' || sp.key === 'ELCT';
+          return `
+            <div class="priority-pill ${isCleared ? 'cleared' : ''}"
+                 style="--pill-accent:${sp.accent};--pill-bg:${sp.bg};--pill-border:${sp.border};--pill-glow:${sp.glow};">
+              <div class="priority-pill-top">
+                <div class="priority-title-wrap">
+                  <span class="priority-rank">${sp.rank}</span>
+                  <span class="priority-name">${sp.label}</span>
+                </div>
+                <div class="priority-count">
+                  <span>${stats.done}/${sp.target}</span>
+                  ${isCleared ? '<span class="cleared-check" title="Cleared">✓</span>' : ''}
+                </div>
+              </div>
+              <div class="priority-bar-track">
+                <div class="priority-bar-fill" style="width:${pct}%;"></div>
+              </div>
+              <div class="priority-foot">
+                <span>${isCleared ? '100% Zeroed' : `${sp.target - stats.done} left`}</span>
+                ${
+                  isQuizUrgent && !isCleared
+                    ? `<span class="quiz-deadline-tag">● ${sp.deadline}</span>`
+                    : `<span style="font-family:var(--font-mono);font-size:10.5px;">${sp.deadline}</span>`
+                }
+              </div>
+            </div>`;
+        }).join('');
+
+        // 3. Live Goal Rings Row + AI Course Status Pill
+        const isRun = state.weekMode === 'run';
+        const goals = [
+          { label: 'New Tuts Locked', cur: m.newTutsDone, target: m.newTutsTotal, color: '#a78bfa' },
+          { label: 'Gym PPLU', cur: m.gymDone, target: m.gymTotal, color: '#a3e635' },
+          { label: 'Squash', cur: m.squashDone, target: m.squashTotal, color: '#fb923c' },
+          { label: isRun ? 'Zone 2 Run' : 'Football', cur: m.cardioDone, target: Math.max(1, m.cardioTotal), color: isRun ? '#2dd4bf' : '#84cc16' },
+          { label: 'Pomodoros', cur: state.pomodoros, target: 12, color: '#f43f5e', openCap: true },
+        ];
+
+        const radius = 17;
+        const circ = 2 * Math.PI * radius;
+
+        const ringsHTML = goals.map((g) => {
+          const pct = Math.min(100, Math.round((g.cur / g.target) * 100));
+          const offset = circ - (pct / 100) * circ;
+          return `
+            <div class="goal-ring-card">
+              <div class="goal-info">
+                <div class="goal-title">${g.label}</div>
+                <div class="goal-metric">${g.cur}<span>/${g.target}</span></div>
+              </div>
+              <div class="ring-wrap">
+                <svg viewBox="0 0 44 44">
+                  <circle cx="22" cy="22" r="${radius}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4" />
+                  <circle class="ring-circle" cx="22" cy="22" r="${radius}" fill="none" stroke="${g.color}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" />
+                </svg>
+                <span class="ring-pct">${pct}%</span>
+              </div>
+            </div>`;
+        }).join('');
+
+        const aiUnlocked = m.backlogRemaining === 0;
+        const aiCardHTML = `
+          <div class="ai-status-card ${aiUnlocked ? 'unlocked' : ''}">
+            <div class="ai-status-top">
+              <span>${aiUnlocked ? '🔓' : '⏸️'}</span>
+              <span>AI Course Status</span>
+            </div>
+            <div class="ai-status-main">${aiUnlocked ? 'AI Course UNLOCKED!' : 'AI Paused'}</div>
+            <div class="ai-status-sub">${aiUnlocked ? 'Resume Andrew Ng ML!' : `Finish ${m.backlogRemaining} Backlog`}</div>
+          </div>`;
+
+        document.getElementById('goalsRow').innerHTML = ringsHTML + aiCardHTML;
+      }
+
+      /* =======================================================================
+         9. RENDER CONTROLS, FILTERS, DAY TABS & CARDS
+         ======================================================================= */
+      function renderControlsUI() {
+        // Week Mode Switch
+        const weekThumb = document.getElementById('weekModeThumb');
+        const btnRun = document.getElementById('btnRunWeek');
+        const btnFoot = document.getElementById('btnFootballWeek');
+        if (state.weekMode === 'run') {
+          weekThumb.style.transform = 'translateX(0%)';
+          weekThumb.style.background = 'linear-gradient(135deg,#2dd4bf,#a3e635)';
+          btnRun.classList.add('active');
+          btnFoot.classList.remove('active');
+        } else {
+          weekThumb.style.transform = 'translateX(100%)';
+          weekThumb.style.background = 'linear-gradient(135deg,#84cc16,#10b981)';
+          btnFoot.classList.add('active');
+          btnRun.classList.remove('active');
+        }
+
+        // View Mode Switch
+        const viewThumb = document.getElementById('viewModeThumb');
+        const btnDay = document.getElementById('btnDayView');
+        const btnOver = document.getElementById('btnOverviewView');
+        if (state.viewMode === 'day') {
+          viewThumb.style.transform = 'translateX(0%)';
+          btnDay.classList.add('active');
+          btnOver.classList.remove('active');
+        } else {
+          viewThumb.style.transform = 'translateX(100%)';
+          btnOver.classList.add('active');
+          btnDay.classList.remove('active');
+        }
+
+        // Hide Skipped Button
+        const hideBtn = document.getElementById('btnHideSkipped');
+        hideBtn.classList.toggle('active-toggle', state.hideSkipped);
+        hideBtn.setAttribute('aria-pressed', String(state.hideSkipped));
+        document.getElementById('hideSkippedLabel').textContent = state.hideSkipped ? 'Skipped Hidden' : 'Hide Skipped Lectures';
+        document.getElementById('hideSkippedIcon').textContent = state.hideSkipped ? '🙈' : '👁️';
+
+        // Pomodoro Panel Toggle
+        const workspace = document.getElementById('workspace');
+        workspace.classList.toggle('pomo-collapsed', state.pomoCollapsed);
+        document.getElementById('togglePomoLabel').textContent = state.pomoCollapsed ? 'Show Timer' : 'Hide Timer';
+        updateFloatingMiniPomo();
+      }
+
+      function renderFilterChips() {
+        const container = document.getElementById('filterRow');
+        container.innerHTML = FILTERS.map((f) => {
+          const isActive = state.activeFilter === f.id;
+          return `
+            <button type="button" class="filter-chip ${isActive ? 'active' : ''}" data-filter="${f.id}">
+              <span class="chip-dot" style="background:${isActive ? '#090d16' : f.dot};"></span>
+              <span>${f.label}</span>
+            </button>`;
+        }).join('');
+
+        container.querySelectorAll('[data-filter]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.activeFilter = btn.dataset.filter;
+            renderFilterChips();
+            renderScheduleViews();
+          });
+        });
+      }
+
+      function renderDayTabs() {
+        const container = document.getElementById('dayTabs');
+        container.innerHTML = SPRINT_DAYS.map((day) => {
+          const isActive = day.id === state.activeDayId;
+          const isToday = day.id === detectedTodayId;
+          const prog = getDayProgress(day);
+
+          return `
+            <button type="button" class="day-tab ${isActive ? 'active' : ''}" data-day-id="${day.id}" role="tab" aria-selected="${isActive}">
+              <div class="day-tab-top">
+                <span class="day-tab-num">${day.dayNum}</span>
+                ${isToday ? '<span class="today-pill">TODAY</span>' : ''}
+              </div>
+              <div class="day-tab-date">${day.dateLabel}</div>
+              <div class="day-tab-progress">
+                <span>${prog.allDone ? '<span class="day-done-badge">✓ Cleared</span>' : `${prog.done}/${prog.total} done`}</span>
+              </div>
+            </button>`;
+        }).join('');
+
+        container.querySelectorAll('[data-day-id]').forEach((tab) => {
+          tab.addEventListener('click', () => {
+            state.activeDayId = tab.dataset.dayId;
+            renderDayTabs();
+            renderDayFocusView();
+          });
+        });
+      }
+
+      function createTaskCardHTML(item, idx) {
+        const meta = getCardStyleMeta(item);
+        const isSkipped = item.type === 'skipped';
+        const checkable = isItemCheckable(item);
+        const isDone = checkable && Boolean(state.completed[item.id]);
+        const isFocusing = state.activeTaskId === item.id;
+        const delayMs = Math.min(idx * 45, 360);
+
+        const timeLabel = item.duration ? `${item.time} • ${item.duration}` : item.time;
+        const roomBadge = item.room ? `<span class="room-pill">${item.room}</span>` : '';
+        const focusBtn = item.focusable
+          ? `<button type="button" class="focus-btn ${isFocusing ? 'focusing' : ''}" data-focus-id="${item.id}">
+               ${isFocusing ? 'Focusing ●' : 'Focus ▶'}
+             </button>`
+          : '';
+
+        let rightControls = '';
+        if (isSkipped) {
+          rightControls = `<span class="skip-tag">Skipped</span>`;
+        } else if (item.type === 'uni-free') {
+          rightControls = `<span class="cat-pill" style="background:rgba(52,211,153,0.14);color:#6ee7b7;border-color:rgba(52,211,153,0.35);">FREE DAY</span>`;
+        } else {
+          rightControls = `
+            <div class="task-actions">
+              ${focusBtn}
+              <button type="button" class="check-btn ${isDone ? 'checked' : ''}" data-check-id="${item.id}" aria-label="Mark ${item.title} completed">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+              </button>
+            </div>`;
+        }
+
+        const footballNoteHTML =
+          item.footballNote && state.weekMode === 'football'
+            ? `<div class="recovery-note"><span>⚡</span><span>${item.footballNote}</span></div>`
+            : '';
+
+        return `
+          <article class="task-card ${isDone ? 'is-completed' : ''} ${isSkipped ? 'is-skipped' : ''} ${isFocusing ? 'is-active-focus' : ''}"
+                   style="animation-delay:${delayMs}ms;--card-accent:${meta.accent};--card-bg:${meta.bg};--card-border:${meta.border};--card-glow:${meta.glow};">
+            <div class="task-icon-box">${getCardIconSVG(item)}</div>
+            <div class="task-body">
+              <div class="task-meta-top">
+                <div class="task-badges">
+                  <span class="time-pill">${timeLabel}</span>
+                  <span class="cat-pill ${meta.urgent ? 'urgent-pulse' : ''}">${meta.label}</span>
+                  ${roomBadge}
+                </div>
+                ${rightControls}
+              </div>
+              <h3 class="task-title">${item.title}</h3>
+              <p class="task-desc">${item.desc}</p>
+              ${footballNoteHTML}
+            </div>
+          </article>`;
+      }
+
+      function renderDayFocusView() {
+        const day = SPRINT_DAYS.find((d) => d.id === state.activeDayId) || SPRINT_DAYS[0];
+        const prog = getDayProgress(day);
+        const banner = document.getElementById('dayBanner');
+        const stack = document.getElementById('dayCardsStack');
+
+        banner.style.borderLeftColor = day.accent;
+        banner.innerHTML = `
+          <div class="day-banner-left">
+            <div class="day-banner-title-row">
+              <h2 class="day-banner-title">${day.dayNum} — ${day.dateLabel}</h2>
+              <span class="day-tag-badge">${day.tag}</span>
+            </div>
+            <p class="day-banner-note">${day.summary}</p>
+          </div>
+          <div class="day-banner-stat">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);font-weight:800;">Day Progress</div>
+              <div class="day-stat-val" style="color:${prog.allDone ? '#34d399' : '#fff'};">${prog.done} / ${prog.total}</div>
+            </div>
+            <div style="font-size:20px;">${prog.allDone ? '🏆' : '🔥'}</div>
+          </div>`;
+
+        const visible = day.items.filter(matchesCurrentFilter);
+        if (visible.length === 0) {
+          stack.innerHTML = `<div class="empty-state">No schedule blocks match the current filter on <strong>${day.dateLabel}</strong>. Try switching to <strong>All</strong>.</div>`;
+          return;
+        }
+
+        stack.innerHTML = visible.map((item, idx) => createTaskCardHTML(item, idx)).join('');
+        attachCardListeners(stack);
+      }
+
+      function renderOverviewView() {
+        const container = document.getElementById('overviewContainer');
+        container.innerHTML = SPRINT_DAYS.map((day) => {
+          const visible = day.items.filter(matchesCurrentFilter);
+          const prog = getDayProgress(day);
+          const isToday = day.id === detectedTodayId;
+
+          return `
+            <section class="glass-panel overview-day-col ${isToday ? 'is-today' : ''}">
+              <div class="overview-day-head">
+                <div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                    <span style="font-family:var(--font-mono);font-size:11px;font-weight:800;color:${day.accent};">${day.dayNum}</span>
+                    ${isToday ? '<span class="today-pill">TODAY</span>' : ''}
+                  </div>
+                  <h3 style="font-size:15.5px;font-weight:800;color:#fff;">${day.dateLabel}</h3>
+                  <div style="font-size:10.5px;font-weight:700;color:var(--text-muted);margin-top:2px;">${day.tag}</div>
+                </div>
+                <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:800;padding:4px 8px;border-radius:8px;background:rgba(9,13,22,0.8);border:1px solid var(--border-subtle);color:${prog.allDone ? '#34d399' : '#cbd5e1'};">
+                  ${prog.done}/${prog.total}
+                </span>
+              </div>
+              <div class="cards-stack" style="gap:8px;">
+                ${
+                  visible.length > 0
+                    ? visible.map((item, idx) => createTaskCardHTML(item, idx)).join('')
+                    : `<div class="empty-state" style="padding:18px 10px;font-size:11.5px;">No matching blocks</div>`
+                }
+              </div>
+            </section>`;
+        }).join('');
+
+        attachCardListeners(container);
+      }
+
+      function renderScheduleViews() {
+        const dayWrap = document.getElementById('dayFocusContainer');
+        const overWrap = document.getElementById('overviewContainer');
+        if (state.viewMode === 'day') {
+          dayWrap.classList.remove('hidden');
+          overWrap.classList.add('hidden');
+          renderDayTabs();
+          renderDayFocusView();
+        } else {
+          dayWrap.classList.add('hidden');
+          overWrap.classList.remove('hidden');
+          renderOverviewView();
+        }
+      }
+
+      function findTaskById(id) {
+        for (const day of SPRINT_DAYS) {
+          const found = day.items.find((i) => i.id === id);
+          if (found) return { item: found, day };
+        }
+        return null;
+      }
+
+      function attachCardListeners(rootEl) {
+        // Checkboxes
+        rootEl.querySelectorAll('[data-check-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.checkId;
+            const lookup = findTaskById(id);
+            if (!lookup) return;
+
+            const prevDayProg = getDayProgress(lookup.day);
+            const nextState = !state.completed[id];
+            state.completed[id] = nextState;
+            saveState();
+
+            const nextDayProg = getDayProgress(lookup.day);
+            if (nextState && !prevDayProg.allDone && nextDayProg.allDone) {
+              burstConfetti(95);
+              showToast(
+                `${lookup.day.dayNum} (${lookup.day.dateLabel}) Complete!`,
+                'Every scheduled block cleared today — awesome consistency!',
+                '🔥',
+                'rgba(56,189,248,0.6)'
+              );
+            }
+
+            renderMissionControl(nextState);
+            renderScheduleViews();
+          });
+        });
+
+        // Focus ▶ buttons
+        rootEl.querySelectorAll('[data-focus-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.focusId;
+            const lookup = findTaskById(id);
+            if (!lookup) return;
+            loadTaskIntoPomodoro(lookup.item, lookup.day);
+          });
+        });
+      }
+
+      /* =======================================================================
+         10. INTEGRATED POMODORO ENGINE
+         ======================================================================= */
+      const POMO_CIRC = 2 * Math.PI * 86;
+
+      function formatMMSS(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+
+      function loadTaskIntoPomodoro(item, day) {
+        // Ensure timer panel is visible
+        if (state.pomoCollapsed) {
+          state.pomoCollapsed = false;
+          renderControlsUI();
+        }
+
+        pausePomodoro();
+        state.activeTaskId = item.id;
+        state.activeTaskTitle = `${day.dayNum} • ${item.title}`;
+
+        const presetKey = item.recommendedPreset || 'deep';
+        state.pomoPreset = presetKey;
+        state.lastWorkPreset = presetKey;
+        state.pomoTotalSec = POMO_PRESETS[presetKey].minutes * 60;
+        state.pomoRemainingSec = state.pomoTotalSec;
+        saveState();
+
+        updatePomodoroUI();
+        renderScheduleViews();
+
+        const panel = document.getElementById('pomoPanel');
+        panel.classList.remove('flash');
+        void panel.offsetWidth;
+        panel.classList.add('flash');
+
+        if (window.innerWidth < 1080) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        startPomodoro();
+        showToast('Focus Timer Locked In', `${item.title} (${POMO_PRESETS[presetKey].label})`, '⏱️', 'rgba(244,63,94,0.55)');
+      }
+
+      function startPomodoro() {
+        if (state.pomoRunning) return;
+        state.pomoRunning = true;
+
+        // Warm up Web Audio API on user gesture
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (Ctx) {
+            if (!audioCtx) audioCtx = new Ctx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+          }
+        } catch (e) {}
+
+        pomoInterval = setInterval(() => {
+          if (state.pomoRemainingSec > 0) {
+            state.pomoRemainingSec--;
+            updatePomodoroDigits();
+          } else {
+            finishPomodoroPhase();
+          }
+        }, 1000);
+
+        updatePomodoroUI();
+      }
+
+      function pausePomodoro() {
+        state.pomoRunning = false;
+        if (pomoInterval) {
+          clearInterval(pomoInterval);
+          pomoInterval = null;
+        }
+        document.title = DEFAULT_TITLE;
+        updatePomodoroUI();
+      }
+
+      function resetPomodoro() {
+        pausePomodoro();
+        const mins = POMO_PRESETS[state.pomoPreset].minutes;
+        state.pomoTotalSec = mins * 60;
+        state.pomoRemainingSec = mins * 60;
+        updatePomodoroUI();
+      }
+
+      function selectPomodoroPreset(presetKey) {
+        if (!POMO_PRESETS[presetKey]) return;
+        pausePomodoro();
+        state.pomoPreset = presetKey;
+        if (!POMO_PRESETS[presetKey].isBreak) state.lastWorkPreset = presetKey;
+        state.pomoTotalSec = POMO_PRESETS[presetKey].minutes * 60;
+        state.pomoRemainingSec = state.pomoTotalSec;
+        saveState();
+        updatePomodoroUI();
+      }
+
+      function finishPomodoroPhase() {
+        pausePomodoro();
+        const current = POMO_PRESETS[state.pomoPreset];
+
+        if (!current.isBreak) {
+          state.pomodoros++;
+          state.focusMinutes += current.minutes;
+          saveState();
+          playChime(false);
+          burstConfetti(70);
+          renderMissionControl(false);
+          showToast('Focus Session Complete!', `+${current.minutes} mins logged. Take a breather!`, '🍅', 'rgba(244,63,94,0.6)');
+
+          // Auto-queue matching break
+          selectPomodoroPreset(current.nextBreak || 'shortBreak');
+        } else {
+          playChime(true);
+          showToast('Break Finished!', 'Refreshed and ready for your next focus block.', '⚡', 'rgba(56,189,248,0.6)');
+          selectPomodoroPreset(state.lastWorkPreset || 'deep');
+        }
+      }
+
+      function updateFloatingMiniPomo() {
+        const mini = document.getElementById('floatingMiniPomo');
+        const showMini = state.pomoCollapsed && state.pomoRunning;
+        mini.classList.toggle('visible', showMini);
+        document.getElementById('miniPomoDigits').textContent = formatMMSS(state.pomoRemainingSec);
+      }
+
+      function updatePomodoroDigits() {
+        const formatted = formatMMSS(state.pomoRemainingSec);
+        document.getElementById('pomoDigits').textContent = formatted;
+        document.getElementById('miniPomoDigits').textContent = formatted;
+
+        const progress = state.pomoTotalSec > 0
+          ? (state.pomoTotalSec - state.pomoRemainingSec) / state.pomoTotalSec
+          : 0;
+        document.getElementById('pomoRingFg').style.strokeDashoffset = POMO_CIRC * progress;
+
+        if (state.pomoRunning) {
+          const isBreak = POMO_PRESETS[state.pomoPreset].isBreak;
+          document.title = `${formatted} • ${isBreak ? 'Break' : 'Focus'} | MET Rescue`;
+        }
+      }
+
+      function updatePomodoroUI() {
+        const preset = POMO_PRESETS[state.pomoPreset];
+        const isBreak = preset.isBreak;
+
+        // Preset buttons active highlight
+        document.querySelectorAll('[data-preset]').forEach((btn) => {
+          const match = btn.dataset.preset === state.pomoPreset;
+          btn.classList.remove('active', 'break-active');
+          if (match) btn.classList.add(isBreak ? 'break-active' : 'active');
+        });
+
+        // Ring colors & glow
+        const ringFg = document.getElementById('pomoRingFg');
+        const ringShell = document.getElementById('pomoRingShell');
+        const modeLabel = document.getElementById('pomoModeLabel');
+        const startBtn = document.getElementById('btnPomoStartPause');
+
+        ringFg.setAttribute('stroke', isBreak ? 'url(#pomoGradBreak)' : 'url(#pomoGradWork)');
+        ringShell.style.setProperty('--pomo-glow', isBreak ? 'rgba(16,185,129,0.5)' : 'rgba(244,63,94,0.5)');
+        ringShell.classList.toggle('running', state.pomoRunning);
+
+        modeLabel.textContent = preset.label;
+        modeLabel.style.color = isBreak ? '#6ee7b7' : '#fda4af';
+        document.getElementById('pomoCycleHint').textContent = preset.hint;
+
+        startBtn.classList.toggle('break-btn', isBreak);
+        document.getElementById('pomoStartIcon').textContent = state.pomoRunning ? '⏸' : '▶';
+        document.getElementById('pomoStartLabel').textContent = state.pomoRunning
+          ? 'Pause'
+          : isBreak
+          ? 'Start Break'
+          : 'Start Focus';
+
+        document.getElementById('pomoStatusLine').textContent = state.pomoRunning
+          ? isBreak
+            ? 'Recharging...'
+            : 'Deep focus in progress...'
+          : 'Ready to crush backlog';
+
+        // Active Task display
+        const taskNameEl = document.getElementById('pomoActiveTaskName');
+        const clearBtn = document.getElementById('btnClearActiveTask');
+        if (state.activeTaskTitle) {
+          taskNameEl.textContent = state.activeTaskTitle;
+          taskNameEl.style.color = '#ffffff';
+          clearBtn.classList.remove('hidden');
+        } else {
+          taskNameEl.textContent = 'Click "Focus ▶" on any study card';
+          taskNameEl.style.color = '#94a3b8';
+          clearBtn.classList.add('hidden');
+        }
+
+        // Sound icon & stats
+        document.getElementById('soundIcon').textContent = state.soundEnabled ? '🔔' : '🔕';
+        document.getElementById('pomoCountStat').textContent = state.pomodoros;
+        document.getElementById('pomoMinsStat').textContent = `${state.focusMinutes}m`;
+
+        updatePomodoroDigits();
+        updateFloatingMiniPomo();
+      }
+
+      /* =======================================================================
+         11. SYNC CODE MODAL & RESET MODAL HANDLERS
+         ======================================================================= */
+      function openSyncModal() {
+        const modal = document.getElementById('syncModal');
+        const ta = document.getElementById('syncTextarea');
+        const msg = document.getElementById('syncStatusMsg');
+        msg.textContent = '';
+        msg.className = 'sync-msg';
+
+        const exportData = {
+          v: 1,
+          completed: state.completed,
+          weekMode: state.weekMode,
+          hideSkipped: state.hideSkipped,
+          pomodoros: state.pomodoros,
+          focusMinutes: state.focusMinutes,
+          soundEnabled: state.soundEnabled,
+        };
+        ta.value = JSON.stringify(exportData);
+        modal.classList.add('open');
+      }
+
+      function closeSyncModal() {
+        document.getElementById('syncModal').classList.remove('open');
+      }
+
+      function copySyncCode() {
+        const ta = document.getElementById('syncTextarea');
+        const msg = document.getElementById('syncStatusMsg');
+        ta.focus();
+        ta.select();
+        try {
+          // Use execCommand('copy') for full iFrame/Safari compatibility
+          const ok = document.execCommand('copy');
+          if (ok) {
+            msg.textContent = 'Copied! Paste this code into Sync Code on your other device.';
+            msg.className = 'sync-msg ok';
+            showToast('Sync Code Copied', 'Ready to paste on your iPad or Laptop.', '📋', 'rgba(96,165,250,0.55)');
+          } else {
+            msg.textContent = 'Select the text above and press Ctrl+C / Cmd+C to copy.';
+            msg.className = 'sync-msg error';
+          }
+        } catch (err) {
+          msg.textContent = 'Select the text above and copy manually.';
+          msg.className = 'sync-msg error';
+        }
+      }
+
+      function importSyncCode() {
+        const ta = document.getElementById('syncTextarea');
+        const msg = document.getElementById('syncStatusMsg');
+        try {
+          const parsed = JSON.parse(ta.value.trim());
+          if (!parsed || typeof parsed !== 'object' || typeof parsed.completed !== 'object') {
+            throw new Error('Invalid sprint backup structure.');
+          }
+          state.completed = parsed.completed;
+          if (parsed.weekMode === 'run' || parsed.weekMode === 'football') state.weekMode = parsed.weekMode;
+          if (typeof parsed.hideSkipped === 'boolean') state.hideSkipped = parsed.hideSkipped;
+          if (typeof parsed.pomodoros === 'number') state.pomodoros = parsed.pomodoros;
+          if (typeof parsed.focusMinutes === 'number') state.focusMinutes = parsed.focusMinutes;
+          if (typeof parsed.soundEnabled === 'boolean') state.soundEnabled = parsed.soundEnabled;
+
+          saveState();
+          renderControlsUI();
+          renderMissionControl(false);
+          renderScheduleViews();
+          updatePomodoroUI();
+          closeSyncModal();
+          showToast('Sync Applied Successfully!', 'Your progress has been imported to this device.', '🔄', 'rgba(16,185,129,0.6)');
+        } catch (err) {
+          msg.textContent = 'Invalid JSON sync code. Please paste the exact backup string.';
+          msg.className = 'sync-msg error';
+        }
+      }
+
+      /* =======================================================================
+         12. INITIALIZE APP & BIND ALL EVENTS
+         ======================================================================= */
+      document.addEventListener('DOMContentLoaded', () => {
+        loadState();
+        renderControlsUI();
+        renderFilterChips();
+        renderMissionControl(false);
+        renderScheduleViews();
+        updatePomodoroUI();
+
+        // Scroll active day tab into view softly
+        const activeTab = document.querySelector(`.day-tab[data-day-id="${state.activeDayId}"]`);
+        if (activeTab && activeTab.scrollIntoView) {
+          activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        // Week Mode Switch
+        document.getElementById('btnRunWeek').addEventListener('click', () => {
+          if (state.weekMode === 'run') return;
+          state.weekMode = 'run';
+          saveState();
+          renderControlsUI();
+          renderMissionControl(false);
+          renderScheduleViews();
+          showToast('Run Week Active', 'Sat Early Morning Zone 2 Run enabled; Friday Football hidden.', '⚡', 'rgba(45,212,191,0.55)');
+        });
+
+        document.getElementById('btnFootballWeek').addEventListener('click', () => {
+          if (state.weekMode === 'football') return;
+          state.weekMode = 'football';
+          saveState();
+          renderControlsUI();
+          renderMissionControl(false);
+          renderScheduleViews();
+          showToast('Football Week Active', 'Fri Evening 1h Football added + light Squash recovery note.', '⚽', 'rgba(132,204,22,0.55)');
+        });
+
+        // View Mode Switch
+        document.getElementById('btnDayView').addEventListener('click', () => {
+          state.viewMode = 'day';
+          renderControlsUI();
+          renderScheduleViews();
+        });
+
+        document.getElementById('btnOverviewView').addEventListener('click', () => {
+          state.viewMode = 'overview';
+          renderControlsUI();
+          renderScheduleViews();
+        });
+
+        // Hide Skipped Lectures
+        document.getElementById('btnHideSkipped').addEventListener('click', () => {
+          state.hideSkipped = !state.hideSkipped;
+          saveState();
+          renderControlsUI();
+          renderScheduleViews();
+        });
+
+        // Toggle Pomodoro Panel
+        document.getElementById('btnTogglePomo').addEventListener('click', () => {
+          state.pomoCollapsed = !state.pomoCollapsed;
+          renderControlsUI();
+        });
+
+        document.getElementById('floatingMiniPomo').addEventListener('click', () => {
+          state.pomoCollapsed = false;
+          renderControlsUI();
+          document.getElementById('pomoPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // Pomodoro Buttons
+        document.querySelectorAll('[data-preset]').forEach((btn) => {
+          btn.addEventListener('click', () => selectPomodoroPreset(btn.dataset.preset));
+        });
+
+        document.getElementById('btnPomoStartPause').addEventListener('click', () => {
+          if (state.pomoRunning) pausePomodoro();
+          else startPomodoro();
+        });
+
+        document.getElementById('btnPomoReset').addEventListener('click', resetPomodoro);
+
+        document.getElementById('btnPomoSkip').addEventListener('click', () => {
+          const isBreak = POMO_PRESETS[state.pomoPreset].isBreak;
+          selectPomodoroPreset(isBreak ? state.lastWorkPreset || 'deep' : 'shortBreak');
+        });
+
+        document.getElementById('btnSoundToggle').addEventListener('click', () => {
+          state.soundEnabled = !state.soundEnabled;
+          saveState();
+          updatePomodoroUI();
+          if (state.soundEnabled) playChime(true);
+        });
+
+        document.getElementById('btnClearActiveTask').addEventListener('click', () => {
+          state.activeTaskId = null;
+          state.activeTaskTitle = null;
+          updatePomodoroUI();
+          renderScheduleViews();
+        });
+
+        // Sync Modal Events
+        document.getElementById('btnOpenSync').addEventListener('click', openSyncModal);
+        document.getElementById('closeSyncModalBtn').addEventListener('click', closeSyncModal);
+        document.getElementById('copySyncBtn').addEventListener('click', copySyncCode);
+        document.getElementById('importSyncBtn').addEventListener('click', importSyncCode);
+        document.getElementById('syncModal').addEventListener('click', (e) => {
+          if (e.target.id === 'syncModal') closeSyncModal();
+        });
+
+        // Reset Modal Events
+        const resetModal = document.getElementById('resetModal');
+        document.getElementById('btnOpenReset').addEventListener('click', () => resetModal.classList.add('open'));
+        document.getElementById('closeResetModalBtn').addEventListener('click', () => resetModal.classList.remove('open'));
+        document.getElementById('cancelResetBtn').addEventListener('click', () => resetModal.classList.remove('open'));
+        resetModal.addEventListener('click', (e) => {
+          if (e.target.id === 'resetModal') resetModal.classList.remove('open');
+        });
+
+        document.getElementById('confirmResetBtn').addEventListener('click', () => {
+          pausePomodoro();
+          state.completed = {};
+          state.pomodoros = 0;
+          state.focusMinutes = 0;
+          state.activeTaskId = null;
+          state.activeTaskTitle = null;
+          state.prevSubjectCleared = { CS: false, ELCT: false, MATH: false, PHYSICS: false };
+          state.prevAllBacklogCleared = false;
+          state.pomoPreset = 'deep';
+          state.lastWorkPreset = 'deep';
+          state.pomoTotalSec = 50 * 60;
+          state.pomoRemainingSec = 50 * 60;
+          saveState();
+
+          resetModal.classList.remove('open');
+          renderControlsUI();
+          renderMissionControl(false);
+          renderScheduleViews();
+          updatePomodoroUI();
+          showToast('Sprint Reset', 'Clean slate ready — crush Day 1!', '↺', 'rgba(96,165,250,0.55)');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
